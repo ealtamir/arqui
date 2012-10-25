@@ -1,5 +1,5 @@
 global _loader		; making entry point visible to linker
-global eokl		; end of kernel land
+global eokl		    ; end of kernel land
 extern kmain		; _main is defined elsewhere
 
 

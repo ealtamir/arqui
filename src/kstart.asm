@@ -8,10 +8,10 @@
 
 %include "../include/grub.inc"
 
-[BITS 32]
+[BITS 32] ;Generates code for 32bit architecture
 
-[global start]
-[extern kmain] ; en kernel.c
+[global start] ;export the start symbol
+[extern kmain] ;imports the kernel.c
 
 start:
 
@@ -28,7 +28,7 @@ start:
 ; Definidos en link.ld
 EXTERN code, bss, end
 
-ALIGN 4
+ALIGN 4 ;Aligns data in memory, used for performance
 mboot:
 	dd MULTIBOOT_HEADER_MAGIC  ; Numero que identifica al header
 				   ; debe ser 0x1BADB002

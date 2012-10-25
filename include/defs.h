@@ -29,31 +29,32 @@
 
 /* Descriptor de segmento */
 typedef struct {
-  word limit,
-       base_l;
-  byte base_m,
-       access,
-       attribs,
-       base_h;
+    word limit;
+    word base_l;
+
+    byte base_m;
+    byte access;
+    byte attribs;
+    byte base_h;
 } DESCR_SEG;
 
 
 /* Descriptor de interrupcion */
 typedef struct {
-  word      offset_l,
-            selector;
-  byte      cero,
-            access;
-  word	    offset_h;
+    word offset_l;
+    word selector;
+    word offset_h;
+
+    byte cero;
+    byte access;
+
 } DESCR_INT;
 
 /* IDTR  */
 typedef struct {
-  word  limit;
-  dword base;
+    word  limit;
+    dword base;
 } IDTR;
-
-     
 
 #endif
 
