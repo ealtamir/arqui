@@ -28,13 +28,18 @@ start:
 ; Definidos en link.ld
 EXTERN code, bss, end
 
-ALIGN 4 ;Aligns data in memory, used for performance
+ALIGN 4 ; Aligns data in memory, used for performance
+
 mboot:
-	dd MULTIBOOT_HEADER_MAGIC  ; Numero que identifica al header
-				   ; debe ser 0x1BADB002
-	dd MULTIBOOT_HEADER_FLAGS  ; Los bits de 0-15 indican requerimientos
-				   ; de la imagen.
-				   ; Los bits 16-31 indican features opcionales
+    ; Numero que identifica al header
+    ; debe ser 0x1BADB002
+	dd MULTIBOOT_HEADER_MAGIC  
+
+    ; Los bits de 0-15 indican requerimientos
+    ; de la imagen.
+	dd MULTIBOOT_HEADER_FLAGS  
+
+    ; Los bits 16-31 indican features opcionales
 	dd MULTIBOOT_CHECKSUM
 
 ; Comienzo de Offsets 8-24 del header, son validos por estar seteado el flag 16.
@@ -42,7 +47,8 @@ mboot:
 	dd mboot	; Dirección de comienzo del header.
 	dd code		; Direccion de comienzo del segmento text.
 	dd bss		; Direccion del final del segmento de datos. Implica que el 
-			; Codigo y el dato deben estar consecutivos. ( lo cumple el formato
-			; a.out )
+			    ; Codigo y el dato deben estar consecutivos. ( lo cumple el formato
+			    ; a.out )
+
 	dd end		; Direccion del final del segmento bss.
 	dd start	; Punto de entrada de la imagen.

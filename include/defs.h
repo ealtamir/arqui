@@ -43,11 +43,9 @@ typedef struct {
 typedef struct {
     word offset_l;
     word selector;
-    word offset_h;
-
     byte cero;
     byte access;
-
+    word offset_h;
 } DESCR_INT;
 
 /* IDTR  */

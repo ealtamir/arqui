@@ -2,9 +2,9 @@
 
 
 /***************************************************************
-*k_clear_screen
+*   k_clear_screen
 *
-* Borra la pantalla en modo texto color.
+*   Borra la pantalla en modo texto color.
 ****************************************************************/
 
 void k_clear_screen() 
@@ -21,25 +21,27 @@ void k_clear_screen()
 }
 
 /***************************************************************
-*setup_IDT_entry
-* Inicializa un descriptor de la IDT
+*   setup_IDT_entry
+*   Inicializa un descriptor de la IDT
 *
-*Recibe: Puntero a elemento de la IDT
-*	 Selector a cargar en el descriptor de interrupcion
-*	 Puntero a rutina de atencion de interrupcion	
-*	 Derechos de acceso del segmento
-*	 Cero
+*   Recibe: 
+*       Puntero a elemento de la IDT
+*       Selector a cargar en el descriptor de interrupcion
+*       Puntero a rutina de atencion de interrupcion	
+*       Derechos de acceso del segmento
+*       Cero
 ****************************************************************/
 
-void setup_IDT_entry (
-        DESCR_INT *item, 
-        byte selector, 
-        dword offset, 
-        byte access,
-		byte cero) {
-  item->selector = selector;
-  item->offset_l = offset & 0xFFFF;
-  item->offset_h = offset >> 16;
-  item->access = access;
-  item->cero = cero;
+void setup_IDT_entry(
+    DESCR_INT *item, 
+    byte selector, 
+    dword offset, 
+    byte access,
+    byte cero
+) {
+  item->selector = selector;        // descriptor de la GDT a usar
+  item->offset_l = offset & 0xFFFF; // low mem address
+  item->offset_h = offset >> 16;    // high mem address
+  item->access = access;            // data bits
+  item->cero = cero;                // non-available bits
 }
