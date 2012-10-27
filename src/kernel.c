@@ -1,5 +1,5 @@
 #include "../include/kasm.h"
-#include "../include/defs.h"
+#include "../include/definiciones.h"
 
 DESCR_INT idt[256];		/* IDT de 10 entradas*/
 IDTR idtr;				    /* IDTR */

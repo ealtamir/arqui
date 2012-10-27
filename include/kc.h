@@ -1,7 +1,7 @@
 /**********************
  kc.h
 **********************/
-#include "defs.h"
+#include "definiciones.h"
 
 #ifndef _kc_
 #define _kc_

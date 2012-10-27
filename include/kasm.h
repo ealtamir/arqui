@@ -3,7 +3,7 @@ kasm.h
 
 ************************************************/
 
-#include "defs.h"
+#include "definiciones.h"
 
 
 unsigned int    _read_msw();
