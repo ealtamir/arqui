@@ -1,4 +1,4 @@
-#include "../include/c/definiciones.h"
+#include "../../include/c/definiciones.h"
 /***************************************************************
  *
  *                      FUNCIONES 

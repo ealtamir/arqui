@@ -1,4 +1,5 @@
-#include "../../include/c/interrupciones/helpers.h"
+#include "../../../include/c/interrupciones/helpers.h"
+#include "../../../include/c/interrupciones/definiciones.h"
 
 /***************************************************************
  *
