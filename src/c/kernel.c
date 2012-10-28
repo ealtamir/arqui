@@ -1,5 +1,5 @@
-#include "../include/interrupciones/estructuras_de_datos.h"
-#include "../include/interrupciones/helpers.h"
+#include "../include/c/interrupciones/estructuras_de_datos.h"
+#include "../include/c/interrupciones/helpers.h"
 
 /***************************************************************
  *

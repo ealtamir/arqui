@@ -6,7 +6,7 @@
 /
 /*****************************************************************/
 
-%include "../include/macros.asm"
+%include "../include/asm/macros.asm"
 
 EXTERN  int_08
 EXTERN  int_09

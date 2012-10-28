@@ -6,7 +6,7 @@
 ;******************************************************
 
 
-%include "../include/grub.inc"
+%include "../include/asm/grub.inc"
 
 [BITS 32] ;Generates code for 32bit architecture
 

@@ -14,9 +14,9 @@
  *                      TIPOS DE DATOS GLOBALES
  * 	
 *************************************************************/
-#define byte unsigned char
-#define word short int
-#define dword int
+typedef unsigned char byte;
+typedef short int word; 
+typedef int dword;
 
 #endif
 

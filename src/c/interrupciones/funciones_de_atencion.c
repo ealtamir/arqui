@@ -3,7 +3,7 @@
  *              FUNCIONES DE ATENCIÓN A INTERRUPCIONES
  *
 ****************************************************************/
-#include "../../include/interrupciones/funciones_de_atencion.h"
+#include "../../include/c/interrupciones/funciones_de_atencion.h"
 /***************************************************************
  *  void int_08
  *      
