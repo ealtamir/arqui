@@ -5,11 +5,11 @@ nasm -f aout ../src/asm/helpers.asm -o asm_helpers.o
 nasm -f aout ../src/asm/interrupciones/handlers.asm -o asm_int_handlers.o
 nasm -f aout ../src/asm/interrupciones/helpers.asm -o asm_int_helpers.o
 nasm -f aout ../src/asm/kstart.asm -o asm_kstart.o
-nasm -f aout ../src/asm/loader.asm -o asm_loader.o
+nasm -f aout ../src/asm/loader.asm -o asm_kstart.o
 
 gcc -c ../src/c/helpers.c -o c_helpers.o -fno-builtin
 gcc -c ../src/c/interrupciones/funciones_de_atencion.c -o c_int_funciones_de_atencion.o -fno-builtin
 gcc -c ../src/c/interrupciones/helpers.c  -o c_int_helpers.o -fno-builtin
 gcc -c ../src/c/kernel.c -o c_kernel.o -fno-builtin
 
-ld -T ../src/asm/link.ld -o kernel.bin asm_helpers.o asm_int_handlers.o asm_int_helpers.o asm_kstart.o asm_loader.o c_int_helpers.o c_int_funciones_de_atencion.o c_helpers.o c_kernel.o
+ld -T ../src/asm/link.ld -o kernel.bin asm_helpers.o asm_int_handlers.o asm_int_helpers.o asm_kstart.o c_int_helpers.o c_int_funciones_de_atencion.o c_helpers.o c_kernel.o

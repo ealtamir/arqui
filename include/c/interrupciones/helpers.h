@@ -34,7 +34,7 @@ void setup_IDT_entry(
  *      Inicializa la IDT y carga las rutinas de atención.
  *
 ****************************************************************/
-void initInterrupts(DESCR_INT *idt);
+void initInterrupts(DESCR_INT *idt, int size);
 
 
 /***************************************************************

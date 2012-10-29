@@ -2,3 +2,4 @@ bin
 img
 .DS_Store
 *.swp
+*.img

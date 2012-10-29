@@ -1,3 +1,4 @@
+#include "../../include/c/interrupciones/definiciones.h"
 #include "../../include/c/interrupciones/estructuras_de_datos.h"
 #include "../../include/c/interrupciones/helpers.h"
 
@@ -22,14 +23,13 @@ extern void k_clear_screen();
  *
 ****************************************************************/
 void kmain() {
-
-    DESCR_INT idt[256];	    // Creo la IDT.
+    DESCR_INT idt[IDT_SIZE];	    // Creo la IDT.
 
     // Borro la pantalla
 	k_clear_screen();
 
     // Inicializo el sistema de interrupciones.
-    initInterrupts(idt);
+    initInterrupts(idt, IDT_SIZE);
 
     //Seteo las máscaras de los PICs
     setPicMasks(0xFD, 0xFF);

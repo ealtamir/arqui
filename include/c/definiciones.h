@@ -7,7 +7,10 @@
  * 	
 *************************************************************/
 // Atributo de video. Letras blancas, fondo negro
-#define WHITE_TXT 0x07 
+#define WHITE_TXT           0x07 
+#define SCREEN_WIDTH        80 
+#define SCREEN_LENGTH       25
+#define CHAR_SIZE           2
 
 /*************************************************************
  *

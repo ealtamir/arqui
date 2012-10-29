@@ -14,8 +14,8 @@ void k_clear_screen()
 	char *vidmem = (char *)0xb8000;
 	unsigned int i = 0;
 
-	while(i < (80*25*2)) {
-		vidmem[i]=' ';
+	while(i < (SCREEN_WIDTH * SCREEN_LENGTH * CHAR_SIZE)) {
+		vidmem[i]='X';
 		i++;
 		vidmem[i] = WHITE_TXT;
 		i++;

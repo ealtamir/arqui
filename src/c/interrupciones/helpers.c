@@ -1,5 +1,5 @@
-#include "../../../include/c/interrupciones/helpers.h"
 #include "../../../include/c/interrupciones/definiciones.h"
+#include "../../../include/c/interrupciones/helpers.h"
 
 /***************************************************************
  *
@@ -41,9 +41,14 @@ void setup_IDT_entry(
  *      Un puntero a la IDT.       
  *
 ****************************************************************/
-void initInterrupts(DESCR_INT *idt) {
+void initInterrupts(DESCR_INT *idt, int size) {
 
+    int i = 0;  // Lo uso como índice.
     IDTR idtr;  // Para cargar el IDTR.
+
+    // Cargo la IDT con ceros, casteo para evitar warnings.
+    for(i = 0; i < IDT_SIZE * sizeof(idt[0]); i++)
+        ((int*)idt)[i] = 0;
 
     // Cargo los descriptores en la IDT
     // Debido a que el PIC1 está mapeado a partir de la interrupción
@@ -51,8 +56,9 @@ void initInterrupts(DESCR_INT *idt) {
     setup_IDT_entry(&idt[8], 8, (dword) &_int_08_hand, ACS_INT, 0);
     setup_IDT_entry(&idt[9], 8, (dword) &_int_09_hand, ACS_INT, 0);
 
-    idtr.base = (dword) idt;
-    idtr.limit = sizeof(idt) - 1;
+    idtr.base = 0;
+    idtr.base += (dword)idt;
+    idtr.limit = (word)(sizeof(idt[0]) * (IDT_SIZE - 1));
     _lidt(&idtr);
 }
 
