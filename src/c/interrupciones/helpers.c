@@ -1,6 +1,6 @@
 #include "../../../include/c/interrupciones/definiciones.h"
 #include "../../../include/c/interrupciones/helpers.h"
-
+#include "../../../include/c/helpers.h" 
 /***************************************************************
  *
  *                      FUNCIONES 
@@ -43,12 +43,11 @@ void setup_IDT_entry(
 ****************************************************************/
 void initInterrupts(DESCR_INT *idt, int size) {
 
-    int i = 0;  // Lo uso como índice.
+    byte i = 0;  // Lo uso como índice.
     IDTR idtr;  // Para cargar el IDTR.
 
-    // Cargo la IDT con ceros, casteo para evitar warnings.
-    for(i = 0; i < IDT_SIZE * sizeof(idt[0]); i++)
-        ((int*)idt)[i] = 0;
+    // Cargo la IDT con ceros.
+    memset_custom((char*) idt, IDT_SIZE * sizeof(idt[0]), 0);
 
     // Cargo los descriptores en la IDT
     // Debido a que el PIC1 está mapeado a partir de la interrupción

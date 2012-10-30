@@ -11,5 +11,6 @@ gcc -c ../src/c/helpers.c -o c_helpers.o -fno-builtin
 gcc -c ../src/c/interrupciones/funciones_de_atencion.c -o c_int_funciones_de_atencion.o -fno-builtin
 gcc -c ../src/c/interrupciones/helpers.c  -o c_int_helpers.o -fno-builtin
 gcc -c ../src/c/kernel.c -o c_kernel.o -fno-builtin
+gcc -c ../src/c/primitivas.c -o c_primitivas.o -fno-builtin
 
-ld -T ../src/asm/link.ld -o kernel.bin asm_helpers.o asm_int_handlers.o asm_int_helpers.o asm_kstart.o c_int_helpers.o c_int_funciones_de_atencion.o c_helpers.o c_kernel.o
+ld -T ../src/asm/link.ld -o kernel.bin asm_helpers.o asm_int_handlers.o asm_int_helpers.o asm_kstart.o c_int_helpers.o c_int_funciones_de_atencion.o c_helpers.o c_kernel.o c_primitivas.o

@@ -3,8 +3,6 @@
 
 #include "../definiciones.h"
 
-extern tickpos;
-
 /***************************************************************
  *
  *              FUNCIONES DE ATENCIÓN A INTERRUPCIONES

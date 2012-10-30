@@ -1,5 +1,5 @@
 #! /bin/bash
 ./compila
 cd ./bin
-cp kernel.bin  /media/grub_img/boot/kernel.bin
+#cp kernel.bin  /media/grub_img/boot/kernel.bin
 #:mcopy kernel.bin b:boot/ -o

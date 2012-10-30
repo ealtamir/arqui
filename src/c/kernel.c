@@ -1,6 +1,7 @@
 #include "../../include/c/interrupciones/definiciones.h"
 #include "../../include/c/interrupciones/estructuras_de_datos.h"
 #include "../../include/c/interrupciones/helpers.h"
+#include "../../include/c/helpers.h"
 
 /***************************************************************
  *
@@ -13,10 +14,6 @@
  *  se escribirá el próximo caracter.
  *      
 ****************************************************************/
-int tickpos = 0;
-
-extern void k_clear_screen();
-
 /***************************************************************
  *  void kmain
  *      Función principal por donde empieza a ejecutarse el kernel.
@@ -32,7 +29,11 @@ void kmain() {
     initInterrupts(idt, IDT_SIZE);
 
     //Seteo las máscaras de los PICs
-    setPicMasks(0xFD, 0xFF);
+    // 0xFF: apaga todas las ints.
+    // 0xFE: sólo timertick.
+    // 0xFD: sólo teclado.
+    // 0xFC: teclado y timertick
+    setPicMasks(0xFC, 0xFF);
 
     while(1) {}
 }
