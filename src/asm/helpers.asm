@@ -19,7 +19,7 @@ SECTION .text
 
 ;********************************************
 ;   _outb
-;       Recibe como primer parámetros, un puerto y como 
+;       Recibe como primer parámetro, un puerto y como 
 ;   segundo, un dato. La función le envía al puerto el dato
 ;
 ;********************************************;

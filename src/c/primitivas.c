@@ -47,7 +47,7 @@ size_t __write(int fd, const void* buffer, size_t count) {
             }
             break;
         case STDIN:
-            // TODO: SHOULD WRITE TO THE KEYBOARD BUFFER.
+            // Could be keyboard buffer.
             break;
         default:
             // No default case
@@ -70,7 +70,22 @@ size_t __write(int fd, const void* buffer, size_t count) {
  *      count: Cantidad de bytes que se leerán.
 ****************************************************************/
 size_t __read(int fd, void* buffer, size_t count) {
-    // TODO
+
+    unsigned int i = 0;          // Index varible.
+
+    switch(fd) {
+        case STDOUT: case STDERR:
+            break;
+        case STDIN:
+            // TODO: SHOULD WRITE TO THE KEYBOARD BUFFER.
+            break;
+        default:
+            // No default case
+            // TODO: RAISE AN ERROR
+            break;
+    }
+    // TODO: REGRESAR EL VALOR ADECUADO.
+    return count;
 }
 
 /***************************************************************

@@ -1,5 +1,6 @@
 #! /bin/bash
-./compila
-cd ./bin
+cd bin
+cp kernel.bin /Volumes/NO\ NAME/boot/kernel.bin
+VBoxManage controlvm tpe reset
 #cp kernel.bin  /media/grub_img/boot/kernel.bin
 #:mcopy kernel.bin b:boot/ -o

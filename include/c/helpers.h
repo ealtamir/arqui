@@ -26,7 +26,7 @@ void showSplashScreen();
  *   Recibe:
  *       time: La cantidad de tiempo de tiempo que debe esperar la función.
 ****************************************************************/
-void wait(int time);
+void wait(unsigned int time);
 
 
 /***************************************************************
@@ -52,13 +52,74 @@ void memset_custom(char *ptr, int size, char value);
 
 
 /***************************************************************
-*   void reset_tickpos
-*       Setea la posición del tick para que quede en la posición
-*           0 de la pantalla.
+*   int putc_custom
+*       Escribe el caracter c (convertido a unsigned char) en
+*           el stdout.
+*
+*   Recibe:
+*       c: Caracter a escribir en el stream.
+*   Devuelve:
+*       El caracter escrito o EOF, si hubo algún error.
 *
 ****************************************************************/
-void reset_tickpos();
+int putc_custom(int c);
 
+/***************************************************************
+*   int fputc
+*       Escribe el caracter c (convertido a un unsigned char) en
+*           stream. Devuelve el caracter escrito o EOF, si hubo
+*           algún error.
+*
+*   Recibe:
+*       c: Caracter a escribir en el stream.
+*       stream: Un puntero a una estructura FILE que contiene
+*           información sobre el stream sobre el cual se escribirá
+*           la información.
+*   Devuelve:
+*       El caracter escrito o EOF, si hubo algún error.
+*
+****************************************************************/
+int fputc(int c, FILE *stream);
+
+/***************************************************************
+*   int printf
+*       Convierte, formatea e imprime la cadena de caracteres 
+*           format en el stdout. La cadena apuntada por format
+*           debe terminar con el null character '\0'.
+*
+*   Recibe:
+*       format: Puntero al string a formatear e imprimir.
+*       arg*: Cantidad variable de argumentos que indican cómo
+*           será formateado el string format.
+*   Devuelve:
+*       Regresa el número de caracteres impresos. 
+*
+****************************************************************/
+int printf_custom(char *format, ... );
+
+/***************************************************************
+*   int fprintf
+*       Versión general de printf que imprime la cadena format
+*           al stream que se le pase y no solo al stdout.
+*
+*   Recibe:
+*       stream: Estructura FILE que contiene información 
+*           del stream.
+*       format: Puntero al string a formatear e imprimir.
+*       ...: cantidad variable de argumentos que indican cómo
+*           será formateado el string format.
+*   devuelve:
+*       regresa el número de caracteres impresos. 
+*
+****************************************************************/
+int fprintf(FILE *stream, char *format, ... );
+
+/****************************************************************
+*   FILE get_stdout
+*       Devuelve una estructura que representa el stdout.      
+*
+****************************************************************/
+FILE get_stdout();
 
 /***************************************************************
  * unsigned int _read_msw

@@ -61,9 +61,12 @@ _int_09_hand:
     mov     ax, 10h			; a utilizar.
     mov     ds, ax          ; Selector 1, privilegios y TI en 0
     mov     es, ax                  
+    in      al, 60h
 
+    push    eax
     call    int_09          ; Llama a la función de C.
-
+    pop     eax
+    
     mov	    al, 20h			; Envio de EOI generico al PIC
 	out	    20h, al
 	popa                            

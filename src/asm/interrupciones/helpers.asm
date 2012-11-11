@@ -15,6 +15,8 @@ GLOBAL  _Sti
 GLOBAL  _lidt
 GLOBAL  _mascaraPIC1
 GLOBAL  _mascaraPIC2
+GLOBAL  _keyboardin
+
 
 
 SECTION .text
@@ -78,5 +80,18 @@ _lidt:
     pop     ebx
     pop     ebp
     retn
+
+;********************************************
+;   _keyboardin
+;       Recibe como primer parámetro, un puerto y como 
+;   segundo, un dato. La función le envía al puerto el dato
+;
+;********************************************;
+_keyboardin: 
+    build_frame
+    in eax, 0x60
+    pop ebp
+    ret
+
 
 ;********************************************;

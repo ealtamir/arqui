@@ -6,12 +6,10 @@
 *
 *****************************************************************/
 #include "../definiciones.h"     
-#include "estructuras_de_datos.h"
 #include "handlers.h"
 
 /***************************************************************
-*   void setup_IDT_entry
-*   Inicializa un descriptor de la IDT
+*   void setup_IDT_entry *   Inicializa un descriptor de la IDT
 *
 *   Recibe: 
 *       Puntero a elemento de la IDT
@@ -104,6 +102,13 @@ void _Cli();
 *
 *****************************************************************/
 void _Sti();	 
+
+/*****************************************************************
+*   int _in
+*       Lee la tecla presionada del teclado.
+*
+*****************************************************************/
+int _keyboardin();	 
 
 
 /***************************************************************/
