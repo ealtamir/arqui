@@ -122,23 +122,6 @@ int fputc(int c, FILE *stream);
 ****************************************************************/
 int printf_custom(char *format, ... );
 
-/***************************************************************
-*   int fprintf
-*       Versión general de printf que imprime la cadena format
-*           al stream que se le pase y no solo al stdout.
-*
-*   Recibe:
-*       stream: Estructura FILE que contiene información 
-*           del stream.
-*       format: Puntero al string a formatear e imprimir.
-*       ...: cantidad variable de argumentos que indican cómo
-*           será formateado el string format.
-*   devuelve:
-*       regresa el número de caracteres impresos. 
-*
-****************************************************************/
-int fprintf(FILE *stream, char *format, ... );
-
 /****************************************************************
 *   FILE get_stdout
 *       Devuelve una estructura que representa el stdout.      

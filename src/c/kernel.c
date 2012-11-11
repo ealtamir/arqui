@@ -25,17 +25,11 @@ void kmain() {
     setPicMasks(0xFC, 0xFF);
 
     putc_custom('S');
-    //printf_custom("%s %s %s %d", "Hello World!", "Otro parametro", "Otro mas...  ", 1000 );
+    printf_custom("%s %s %s %d", "Hello World!", "Otro parametro", "Otro mas...  ", 1000 );
     putc_custom(' ');
     putc_custom(' ');
     putc_custom(' ');
-    int i = 5;
-    char c = 0;
-    while(1) {
-        c = getc();
-        putc_custom(c);
-        i--;
-    }
+    scanf("Hello world!");
     putc_custom('A');
 
 }

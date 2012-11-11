@@ -17,6 +17,14 @@
 
 typedef __builtin_va_list va_list;
 
+typedef struct {
+    bool minus;
+    char specifier;
+    char rep;
+    char width[5];
+    char precision[5];
+} Format;
+
 typedef enum { 
     STARTING_PARSE,
     MINUS_FOUND,
@@ -26,23 +34,23 @@ typedef enum {
     REP_CHAR_FOUND
 } PRINTF_STATES;
 
-unsigned int  print_param(
+unsigned int  process_params(
     char format,
-    int width,
-    int precision,
-    int rep,
-    bool minus,
-    va_list *args
+    Format format_spec,
+    va_list *args,
+    FILE* stream
 );
 
 unsigned int parse_fspecifier(
-    const char* format, 
-    unsigned int* chars_seen,
-    va_list *args
+    char* format,
+    Format* format_spec
 );
 
 void __stack_chk_fail(void);
 void printstr(char *s);
+int fprintf_custom(FILE *stream, char *format, va_list *args);
+int process_int(int fd, Format format_spec, va_list* args);
+int process_str(int fd, Format format_spec, va_list* args);
 
 /***************************************************************
 *   k_clear_screen
@@ -123,6 +131,25 @@ int getc() {
 *
 ****************************************************************/
 int scanf(const char *format, ... ) {
+    char c = '\0';
+    char input[256];
+    unsigned int buffer_size = 0;
+    unsigned int i = 0;     
+    va_list args;
+    
+    buffer_size = sizeof(input);
+    memset_custom(input, sizeof(input), '\0');
+    va_start(args, format);
+
+    while(i < sizeof(input) && c != '\n') {
+        c = getc(); 
+        input[i] = c;
+        i++;
+    }
+    // Reemplazo el último caracter por \0.
+    input[i-1] = '\0' ;
+    printf_custom("%s", input);
+    return i - 1; // Resto porque dejo i adelantado.
 }
 
 
@@ -190,7 +217,35 @@ int fputc(int c, FILE *stream) {
 *       regresa el número de caracteres impresos. 
 *
 ****************************************************************/
-int fprintf(FILE *stream, char *format, ... ) {
+int fprintf_custom(FILE *stream, char *format, va_list *args) {
+    // Cuenta la cantidad de parámetros que se le pasan a la función
+    // a partir de la cantidad de especificadores de formato %
+    // que contenga el string.
+    
+    unsigned int i = 0;                 // Index
+    unsigned int chars_seen = 0;        // Número de chars impresos.
+    int printd_chars = 0;      // Número de chars impresos.
+    Format format_spec;
+
+    for(i = 0; format[i] != '\0'; i++) {
+        if(format[i] == '%') {
+            i += parse_fspecifier(
+                format + i, // Puntero al % actual.
+                &format_spec
+            );
+            printd_chars += process_params(
+                format[i],
+                format_spec,
+                args,
+                stream
+            );
+
+        } else {
+            putc_custom(format[i]);
+            printd_chars++;
+        }
+    }
+    return printd_chars;
 
 }
 
@@ -210,39 +265,15 @@ int fprintf(FILE *stream, char *format, ... ) {
 *
 ****************************************************************/
 int printf_custom(char *format, ... ) {
-    // Cuenta la cantidad de parámetros que se le pasan a la función
-    // a partir de la cantidad de especificadores de formato %
-    // que contenga el string.
-    
-    // bool leave = false;
-    unsigned int i = 0;                 // Index
-    unsigned int params_seen = 0;       // Número de parámetros
-    unsigned int chars_seen = 0;        // Número de chars impresos.
-    unsigned int printd_chars = 0;      // Número de chars impresos.
-
-    void* param = format;
-
+    int printed_chars = 0;
     va_list args;
-    va_start(args, format);
 
-    for(i = 0; format[i] != '\0'; i++) {
-        if(format[i] == '%') {
-            printd_chars += parse_fspecifier(
-                format + i,
-                &chars_seen,
-                &args
-            );
-            params_seen++;
-            
-            // Adelanto hasta el fin del especificador.
-            i += chars_seen;
-        } else {
-            putc_custom(format[i]);
-            printd_chars++;
-        }
-    }
+    va_start(args, format);
+    FILE stdout = get_stdout();
+    printed_chars = fprintf_custom(&stdout, format, &args);
     va_end(args);
-    return printd_chars;
+
+    return printed_chars;
 }
 
 
@@ -261,36 +292,28 @@ int printf_custom(char *format, ... ) {
 *       Regresa la cantidad de caracteres impresos.
 *
 ****************************************************************/
-unsigned int parse_fspecifier(
-    const char* format,
-    unsigned int* chars_seen,
-    va_list *args
-) {
-    
+unsigned int parse_fspecifier(char* format, Format* format_spec) {
+
     PRINTF_STATES state = STARTING_PARSE;
-    bool minus = false;                 // Dice si aparece un símbolo de '-'
     char c = 0;
-    char rep = 0;                       // Dice si aparece h o l.
-    char width[5];                      // Dígitos que representan el width.
-    char precision[5];                  // Dígitos que representan la precisión.
     unsigned int i = 0;
     unsigned int j = 0;
     
-    memset_custom(width, sizeof(width), 0);
-    memset_custom(precision, sizeof(precision), 0);
+    memset_custom(format_spec->width, sizeof(format_spec->width), 0);
+    memset_custom(format_spec->precision, sizeof(format_spec->precision), 0);
     
-    c = format[i];
     // Justo depués de  encontrar un % espero leer h, l, una cifra
     // representando el width o una representando precision, pero
     // no un caracter que indica el formato, por eso me detengo
     // si encuentro un caracter alfabético.
+    c = format[i];
     while(isalpha(c) == false || c == 'h' || c == 'l') {
         switch(c) {
             case '%':
                 // No hace nada.
                 break;
             case '-':
-                minus = true;
+                format_spec->minus = true;
                 state = MINUS_FOUND;
                 break;
             case '.':
@@ -304,29 +327,29 @@ unsigned int parse_fspecifier(
                     || state == STARTING_PARSE
                     || state == READING_WIDTH) {
                     state = READING_WIDTH;
-                    if( j < sizeof(width) - 1) // Ultimo lugar de width es \0
-                        width[j++] = c;
+                    if( j < sizeof(format_spec->width) - 1) // Ultimo lugar de width es \0
+                        format_spec->width[j++] = c;
                 }
                 else if (state == POINT_FOUND
                          || state == READING_PRECISION) {
                     state = READING_PRECISION;
-                    if( j < sizeof(precision) - 1) // Ultimo lugar de width es \0
-                        precision[j++] = c;
+                    if( j < sizeof(format_spec->precision) - 1) // Ultimo lugar de width es \0
+                        format_spec->precision[j++] = c;
                 }
                 break;
             case 'h':
-                if (rep == 0
+                if (format_spec->rep == 0
                     && state != POINT_FOUND
                     && state != MINUS_FOUND)
-                    rep = 'h';
+                    format_spec->rep = 'h';
                 else
                     // TODO: STOP EXECUTION
                     break;
             case 'l':
-                if (rep == 0
+                if (format_spec->rep == 0
                     && state != POINT_FOUND
                     && state != MINUS_FOUND)
-                    rep = 'l';
+                    format_spec->rep = 'l';
                 else
                     // TODO: STOP EXECUTION
                     break;
@@ -337,49 +360,31 @@ unsigned int parse_fspecifier(
         if ( state == POINT_FOUND ) {
             // TODO: STOP EXECUTION
         }
+        // Get next char in the format specifier string.
         i++;
         c = format[i];
     }
-    // Indica cuantos caracteres se leyeron
-    // apenas se encontró el % del especificador
-    // (incluye a % en la cuenta).
-    *chars_seen = i;
-    
-    return print_param(
-        format[i],
-        atoi(width),
-        atoi(precision),
-        rep,
-        minus,
-        args
-    );
+    return i;
 }
 
 /***************************************************************
-*   unsigned int  print_param
+*   unsigned int  process_params
 *
 ****************************************************************/
-unsigned int  print_param(
+unsigned int  process_params(
     char format,
-    int width,
-    int precision,
-    int rep,
-    bool minus,
-    va_list *args
+    Format format_spec,
+    va_list *args,
+    FILE* stream
 ) {
-    int num = 0;                    
     unsigned int i = 0;             // index
     unsigned int chars_num = 0;     // Chars impresos
     char* str = 0;                  // Uso para apuntar a strings
-    char num_str[20];
 
 
     switch(format) {
         case 'd':case 'i':  // integer
-            num = va_arg(*args, int);
-            itoa(num, num_str, sizeof(num_str));
-            chars_num = strlen_custom(num_str);
-            printstr(num_str);
+            chars_num = process_int(stream->fd, format_spec, args);
             break;
         case 'o':           // unsigned octal number
             break;
@@ -390,9 +395,7 @@ unsigned int  print_param(
         case 'c':           // single character
             break;
         case 's':           // \0 terminated string
-            chars_num = strlen_custom(str);
-            str = va_arg(*args, char* );
-            printstr(str);
+            chars_num = process_str(stream->fd, format_spec, args);
             break;
         case 'f':           // double
             break;
@@ -409,6 +412,35 @@ unsigned int  print_param(
     return chars_num;
 }
 
+int process_int(int fd, Format format_spec, va_list* args) {
+    int num = 0;
+    char num_str[20];
+
+    switch(fd) {
+        case STDOUT:
+            num = va_arg(*args, int);
+            itoa(num, num_str, sizeof(num_str));
+            printstr(num_str);
+            return strlen_custom(num_str);
+        break;
+        case STDIN:
+        break;
+    }
+}
+int process_str(int fd, Format format_spec, va_list* args) {
+
+    char* str = 0;
+    
+    switch(fd) {
+        case STDOUT:
+            str = va_arg(*args, char* );
+            printstr(str);
+            return strlen_custom(str);
+        break;
+        case STDIN:
+        break;
+    }
+}
 
 /****************************************************************
 *   FILE get_stdout
