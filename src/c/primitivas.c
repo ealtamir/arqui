@@ -72,12 +72,13 @@ size_t __write(int fd, const void* buffer, size_t count) {
 size_t __read(int fd, void* buffer, size_t count) {
 
     unsigned int i = 0;          // Index varible.
+    unsigned int j = 0;
 
     switch(fd) {
         case STDOUT: case STDERR:
             break;
         case STDIN:
-            // TODO: SHOULD WRITE TO THE KEYBOARD BUFFER.
+
             break;
         default:
             // No default case

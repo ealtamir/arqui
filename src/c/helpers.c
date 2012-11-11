@@ -9,6 +9,14 @@
  *                      FUNCIONES 
  *
 ****************************************************************/
+
+#define va_start(v,l) __builtin_va_start(v,l)
+#define va_arg(v,l)   __builtin_va_arg(v,l)
+#define va_end(v)     __builtin_va_end(v)
+#define va_copy(d,s)  __builtin_va_copy(d,s)
+
+typedef __builtin_va_list va_list;
+
 typedef enum { 
     STARTING_PARSE,
     MINUS_FOUND,
@@ -20,21 +28,21 @@ typedef enum {
 
 unsigned int  print_param(
     char format,
-    void **param,
     int width,
     int precision,
     int rep,
-    bool minus
+    bool minus,
+    va_list *args
 );
 
 unsigned int parse_fspecifier(
     const char* format, 
-    unsigned int params_seen, 
     unsigned int* chars_seen,
-    void **param
+    va_list *args
 );
 
 void __stack_chk_fail(void);
+void printstr(char *s);
 
 /***************************************************************
 *   k_clear_screen
@@ -169,29 +177,21 @@ int printf_custom(char *format, ... ) {
     
     // bool leave = false;
     unsigned int i = 0;                 // Index
-    unsigned int j = 0;                 // Index
     unsigned int params_seen = 0;       // Número de parámetros
     unsigned int chars_seen = 0;        // Número de chars impresos.
     unsigned int printd_chars = 0;      // Número de chars impresos.
-    
-    // Puntero al parámetro que voy a usar a continuación
-    // Los parámetros están inmediatamente después del string de
-    // format. Sumo 1 para incluir el null character.
-    void *param = format - strlen_custom(format) + 1;
 
-    for(j = 0; j < 300; j++) {
-        putc_custom(((char*)format)[j]);
-    }
-    
-    // El string apuntado por format debe terminar con un
-    // caracter '\0'.
+    void* param = format;
+
+    va_list args;
+    va_start(args, format);
+
     for(i = 0; format[i] != '\0'; i++) {
         if(format[i] == '%') {
             printd_chars += parse_fspecifier(
-                format,
-                params_seen,
+                format + i,
                 &chars_seen,
-                &param
+                &args
             );
             params_seen++;
             
@@ -202,6 +202,7 @@ int printf_custom(char *format, ... ) {
             printd_chars++;
         }
     }
+    va_end(args);
     return printd_chars;
 }
 
@@ -223,9 +224,8 @@ int printf_custom(char *format, ... ) {
 ****************************************************************/
 unsigned int parse_fspecifier(
     const char* format,
-    unsigned int params_seen,
     unsigned int* chars_seen,
-    void **param
+    va_list *args
 ) {
     
     PRINTF_STATES state = STARTING_PARSE;
@@ -308,11 +308,11 @@ unsigned int parse_fspecifier(
     
     return print_param(
         format[i],
-        param,
         atoi(width),
         atoi(precision),
         rep,
-        minus
+        minus,
+        args
     );
 }
 
@@ -322,20 +322,25 @@ unsigned int parse_fspecifier(
 ****************************************************************/
 unsigned int  print_param(
     char format,
-    void **param,
     int width,
     int precision,
     int rep,
-    bool minus
+    bool minus,
+    va_list *args
 ) {
+    int num = 0;                    
     unsigned int i = 0;             // index
-    unsigned int str_len = 0;
-    char *str = *param;
+    unsigned int chars_num = 0;     // Chars impresos
+    char* str = 0;                  // Uso para apuntar a strings
+    char num_str[20];
 
-    str_len = strlen_custom(str);
 
     switch(format) {
         case 'd':case 'i':  // integer
+            num = va_arg(*args, int);
+            itoa(num, num_str, sizeof(num_str));
+            chars_num = strlen_custom(num_str);
+            printstr(num_str);
             break;
         case 'o':           // unsigned octal number
             break;
@@ -345,16 +350,10 @@ unsigned int  print_param(
             break;
         case 'c':           // single character
             break;
-        case 's':           // string
-            // it must end with \0 or the number of chars
-            // must be given by the precision.
-            printf_custom("Hasta aca llego!");
-            printf_custom(str);
-
-            for(i = 0; i < str_len; i++) {
-                putc_custom(str[i]);
-            }
-            (*param) -= str_len - 1;
+        case 's':           // \0 terminated string
+            chars_num = strlen_custom(str);
+            str = va_arg(*args, char* );
+            printstr(str);
             break;
         case 'f':           // double
             break;
@@ -368,10 +367,21 @@ unsigned int  print_param(
             // TODO: STOP EXECUTION.
             break;
     }
-    return str_len;
+    return chars_num;
 }
 
 
+/****************************************************************
+*   FILE get_stdout
+*       Devuelve una estructura que representa el stdout.      
+*
+****************************************************************/
+void printstr(char *s) {
+    unsigned int i = 0;
+    for(i = 0; s[i] != '\0'; i++) {
+        putc_custom(s[i]);
+    }
+}
 
 /****************************************************************
 *   FILE get_stdout

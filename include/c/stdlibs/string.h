@@ -1,7 +1,34 @@
 #ifndef stdlibs_string
 #define stdlibs_string
 
-unsigned int strlen_custom(const char* str);
+/***************************************************************
+ *
+ *                      FUNCIONES 
+ *
+****************************************************************/
+/****************************************************************
+*   unsigned int atoi
+*       Devuelve la representación decimal de un número en ASCII.
+*
+****************************************************************/
 unsigned int atoi(const char *s);
 
+
+/****************************************************************
+*   int strlen_custom
+*
+****************************************************************/
+unsigned int strlen_custom(const char* str);
+
+
+/****************************************************************
+*   void itoa
+*       Devuelve la representación en ASCII de un dígito que se le
+*           pasa como parámetro.
+*
+****************************************************************/
+void itoa(int value, char *sp, int buff_size);
+
+
+/****************************************************************/
 #endif
