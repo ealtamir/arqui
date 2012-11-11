@@ -24,7 +24,18 @@ void kmain() {
     // 0xFC: teclado y timertick
     setPicMasks(0xFC, 0xFF);
 
-    printf_custom("%s %s %s %d", "Hello World!", "Otro parametro", "Otro mas...  ", 1000 );
+    putc_custom('S');
+    //printf_custom("%s %s %s %d", "Hello World!", "Otro parametro", "Otro mas...  ", 1000 );
+    putc_custom(' ');
+    putc_custom(' ');
+    putc_custom(' ');
+    int i = 5;
+    char c = 0;
+    while(1) {
+        c = getc();
+        putc_custom(c);
+        i--;
+    }
+    putc_custom('A');
 
-    while(1) {}
 }

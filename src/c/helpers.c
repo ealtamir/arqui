@@ -88,6 +88,43 @@ void memset_custom(char *ptr, int size, char value) {
         ptr[i] = value;
 }
 
+/***************************************************************
+*   int fgetc
+*
+*
+****************************************************************/
+int fgetc(FILE *stream) {
+    int fd = stream->fd;    // STDOUT por lo general.
+    int count = 1;          // caracteres a leer.
+    int buffer = 0;         // almacena el caracter leído.
+    int result = 0;         // cant de chars leídos.
+    fflush(STDIN);
+
+    result = __read(fd, (void*) &buffer, count);
+    return buffer;
+}
+
+
+/***************************************************************
+*   int getc
+*       Obtiene un caracter del STDIN. En este caso, el teclado.
+*
+*
+****************************************************************/
+int getc() {
+    FILE stdin = get_stdin();
+    return fgetc(&stdin);
+}
+
+
+/***************************************************************
+*   int scanf
+*
+*
+****************************************************************/
+int scanf(const char *format, ... ) {
+}
+
 
 /***************************************************************
 *   int putc_custom
@@ -104,6 +141,8 @@ int putc_custom(int c) {
     FILE stdout = get_stdout();
     return fputc(c, &stdout);
 }
+
+
 /***************************************************************
 *   int fputc
 *       Escribe el caracter c (convertido a un unsigned char) en
@@ -391,6 +430,15 @@ void printstr(char *s) {
 FILE get_stdout() {
     FILE stdout = { STDOUT, 0, 0 };
     return stdout;
+}
+/****************************************************************
+*   FILE get_stdout
+*       Devuelve una estructura que representa el stdout.      
+*
+****************************************************************/
+FILE get_stdin() {
+    FILE stdin = { STDIN, 0, 0 };
+    return stdin;
 }
 
 void __stack_chk_fail(void) {

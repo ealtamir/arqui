@@ -16,6 +16,8 @@
 ****************************************************************/
 int (*player)(void);
 
+#define KEYBOARD_BUFFER_SIZE    200
+
 // // // //  // // // //  // // // //  // // // //  // // // //  
 // NOTA:
 // Como los sistema POSIX, éste kernel utilizará el stdin, stdout
@@ -36,6 +38,7 @@ int (*player)(void);
 ****************************************************************/
 size_t __write(int fd, const void* buffer, size_t count);
 
+
 /***************************************************************
  *   size_t __read
  *       Primitiva de lectura del sistema.
@@ -49,6 +52,7 @@ size_t __write(int fd, const void* buffer, size_t count);
 ****************************************************************/
 size_t __read(int fd, void* buffer, size_t count);
 
+
 /***************************************************************
  *
  *  void reset_tickpos
@@ -56,6 +60,15 @@ size_t __read(int fd, void* buffer, size_t count);
 ****************************************************************/
 // TODO: Sacar esto y escribir un controlador de video apropiado.
 void reset_tickpos();
+
+/***************************************************************
+*   void fflush
+*       Vacía el buffer que le corresponde al fd pasádo como 
+*           parámetro.
+*
+****************************************************************/
+void fflush(int fd);
+
 
 #endif
 
