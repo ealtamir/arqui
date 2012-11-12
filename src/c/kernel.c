@@ -2,6 +2,9 @@
 #include "../../include/c/definiciones.h"
 #include "../../include/c/interrupciones/helpers.h"
 #include "../../include/c/helpers.h"
+#include "../../include/c/video.h"
+
+extern word virtual_screen;
 
 /***************************************************************
 *  void kmain
@@ -24,12 +27,14 @@ void kmain() {
     // 0xFC: teclado y timertick
     setPicMasks(0xFC, 0xFF);
 
-    putc_custom('S');
     printf_custom("%s %s %s %d", "Hello World!", "Otro parametro", "Otro mas...  ", 1000 );
     putc_custom(' ');
     putc_custom(' ');
     putc_custom(' ');
-    scanf("Hello world!");
-    putc_custom('A');
+
+    //show_vscreen();
+    
+
+    while(1) {}
 
 }

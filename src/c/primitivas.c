@@ -26,8 +26,8 @@ int tickpos = 0;
 bool l_shift_pressed = false;
 bool r_shift_pressed = false;
 char keypressed_buffer[KEYBOARD_BUFFER_SIZE];
-char* keyboard_set_mayus = "_1234567890_+\b\tQWERTYUIOP{}\n_ASDFGHJKL;\"~_|ZXCVBNM<>?___ _";
 char* keyboard_set_minus = "_1234567890-=\b\tqwertyuiop[]\n_asdfghjkl;'`_\\zxcvbnm,./___ _";
+char* keyboard_set_mayus = "_!@#$%^&*()_+\b\tQWERTYUIOP{}\n_ASDFGHJKL;\"~_|ZXCVBNM<>?___ _";
 unsigned int read_kbuffer_ptr = 0;
 unsigned int write_kbuffer_ptr = 0;
 /////////////////////////////////////////////////////////////////

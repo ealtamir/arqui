@@ -49,6 +49,7 @@ unsigned int parse_fspecifier(
 void __stack_chk_fail(void);
 void printstr(char *s);
 int fprintf_custom(FILE *stream, char *format, va_list *args);
+int fscanf_custom(FILE *stream, const char *format, va_list *args);
 int process_int(int fd, Format format_spec, va_list* args);
 int process_str(int fd, Format format_spec, va_list* args);
 
@@ -130,16 +131,14 @@ int getc() {
 *
 *
 ****************************************************************/
-int scanf(const char *format, ... ) {
+int fscanf_custom(FILE *stream, const char* format, va_list *args) {
     char c = '\0';
     char input[256];
     unsigned int buffer_size = 0;
     unsigned int i = 0;     
-    va_list args;
     
     buffer_size = sizeof(input);
     memset_custom(input, sizeof(input), '\0');
-    va_start(args, format);
 
     while(i < sizeof(input) && c != '\n') {
         c = getc(); 
@@ -150,6 +149,25 @@ int scanf(const char *format, ... ) {
     input[i-1] = '\0' ;
     printf_custom("%s", input);
     return i - 1; // Resto porque dejo i adelantado.
+
+}
+
+
+/***************************************************************
+*   int scanf
+*
+*
+****************************************************************/
+int scanf(const char *format, ... ) {
+    int read_chars;
+    va_list args;
+
+    va_start(args, format);
+    FILE stdin = get_stdin();
+    read_chars = fscanf_custom(&stdin, format, &args);
+    va_end(args);
+
+    return read_chars;
 }
 
 
@@ -377,10 +395,7 @@ unsigned int  process_params(
     va_list *args,
     FILE* stream
 ) {
-    unsigned int i = 0;             // index
-    unsigned int chars_num = 0;     // Chars impresos
-    char* str = 0;                  // Uso para apuntar a strings
-
+    unsigned int chars_num = 0;     // Chars impresos o leídos.
 
     switch(format) {
         case 'd':case 'i':  // integer
@@ -427,8 +442,8 @@ int process_int(int fd, Format format_spec, va_list* args) {
         break;
     }
 }
-int process_str(int fd, Format format_spec, va_list* args) {
 
+int process_str(int fd, Format format_spec, va_list* args) {
     char* str = 0;
     
     switch(fd) {

@@ -10,10 +10,14 @@
 #define SCREEN_LENGTH       25
 #define SCREEN_WIDTH        80 
 #define SCREEN_ADDRESS      0xB8000
+#define TOTAL_WIDTH         SCREEN_WIDTH*CHAR_SIZE
 #define SCREEN_SIZE         SCREEN_WIDTH * SCREEN_LENGTH * CHAR_SIZE
 
 // Atributo de video. Letras blancas, fondo negro
-#define WHITE_TXT           0x07 
+#define WHITE_TXT           0x0007 
+#define SPACE               0x2000
+#define EMPTY_SPACE         ((WHITE_TXT << 0x08) | (SPACE >> 0x08))
+#define SET_CHAR(c)         ((WHITE_TXT << 0x08) | (c))
 
 #define OS_PID	            0
 
