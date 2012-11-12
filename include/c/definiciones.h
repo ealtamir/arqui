@@ -18,7 +18,9 @@
 #define SPACE               0x2000
 #define EMPTY_SPACE         ((WHITE_TXT << 0x08) | (SPACE >> 0x08))
 #define SET_CHAR(c)         ((WHITE_TXT << 0x08) | (c))
-
+#define BLINK_COLOR             0x78
+#define SET_CHAR_BLINK_ON(c)    ((BLINK_COLOR) << 0x08 | (c))
+#define POINTER_BLINK_SPEED     10
 #define OS_PID	            0
 
 // File Descriptors POSIX.

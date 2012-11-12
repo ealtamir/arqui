@@ -4,6 +4,7 @@
 #include "../../../include/c/interrupciones/helpers.h"
 #include "../../../include/c/stdlibs/string.h"
 #include "../../../include/c/helpers.h"
+#include "../../../include/c/video.h"
 
 
 /***************************************************************
@@ -17,6 +18,7 @@
 #define R_SHIFT_REALEASED   0xB6
 #define PRINT_KBUFFER       0x38
 
+int cursor_blink_timer = 0;
 
 // Variables externa declaradas en primitivas.c
 extern char keypressed_buffer[];
@@ -32,14 +34,13 @@ extern bool r_shift_pressed;
  *      
 ****************************************************************/
 void int_08() {
-//    unsigned int i = 0;
-//
-//    putc_custom('C');
-//    while(keypressed_buffer[i] != '\0') {
-//        putc_custom(keypressed_buffer[i]);
-//        i++;
-//    }
-//
+    _Cli();
+    cursor_blink_timer++;
+    if( cursor_blink_timer == POINTER_BLINK_SPEED) {
+        blink_pointer_toggle();
+        cursor_blink_timer = 0;
+    }
+    _Sti();
 }
 
 
@@ -49,6 +50,7 @@ void int_08() {
  *
 ****************************************************************/
 void int_09(unsigned char scancode) {
+    _Cli();
     size_t result = 0;
     const char whitespace = WHITE_TXT;
     char* keys = 0;
@@ -85,6 +87,7 @@ void int_09(unsigned char scancode) {
             }
         break;
     }
+    _Sti();
 }
 
 

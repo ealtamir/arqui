@@ -14,8 +14,24 @@
 *************************************************************/
 void set_row(unsigned int lrow);
 void set_col(unsigned int lcol);
-int get_row(unsigned int lrow);
-int get_col(unsigned int lcol);
+int get_row();
+int get_col();
+
+
+/*************************************************************
+ *  void show_vscreen
+ *                  
+ * 	
+*************************************************************/
+void blink_pointer_toggle();
+
+
+/*************************************************************
+ *  void show_vscreen
+ *                  
+ * 	
+*************************************************************/
+void clear_blink();
 
 /*************************************************************
  *  void show_vscreen
@@ -62,7 +78,7 @@ void print_chr(char c);
  *                  
  * 	
 *************************************************************/
-void print_str(char* s);
+void print_str(const char* s);
 
 /*************************************************************
  *  void print_vscreen

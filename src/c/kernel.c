@@ -3,8 +3,8 @@
 #include "../../include/c/interrupciones/helpers.h"
 #include "../../include/c/helpers.h"
 #include "../../include/c/video.h"
+#include "../../include/c/shell.h"
 
-extern word virtual_screen;
 
 /***************************************************************
 *  void kmain
@@ -32,20 +32,5 @@ void kmain() {
     putc_custom(' ');
     putc_custom(' ');
 
-    fill_screen('&');
-    print_vscreen();
-    char c = 0;
-    set_col(20);
-    set_row(0);
-    while(1) {
-        c = getc();
-        
-        if( c == '\b' ) {
-            backspace();
-            print_vscreen();
-        }
-    }
-
-    while(1) {}
-
+    shell();
 }

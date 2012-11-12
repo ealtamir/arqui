@@ -1,6 +1,7 @@
 #include "../../include/c/definiciones.h"
 #include "../../include/c/primitivas.h"
 #include "../../include/c/video.h"
+#include "../../include/c/interrupciones/helpers.h"
 
 /***************************************************************
 *
@@ -14,10 +15,32 @@ unsigned int col = 0;
 
 void set_row(unsigned int lrow) { row = lrow; }
 void set_col(unsigned int lcol) { col = lcol; }
-int get_row(unsigned int lrow) { return row; }
-int get_col(unsigned int lcol) { return col; }
+int get_row() { return row; }
+int get_col() { return col; }
+
+
+
+void blink_pointer_toggle() {
+    char c = 0;
+    word pos_data = virtual_screen[row][col];
+    c = (char) pos_data;
+    pos_data >>= 0x08;
+    if( pos_data == WHITE_TXT ) {
+        set_pos(row, col, SET_CHAR_BLINK_ON(c));
+    } else {
+        set_pos(row, col, SET_CHAR(c));
+    }
+    print_vscreen();
+}
+void clear_blink() {
+    word w = virtual_screen[row][col];
+    char c = (char) w;
+    set_pos(row, col, SET_CHAR(c));
+}
 
 void newline() {
+    setPicMasks(0xFD, 0xFF);
+    clear_blink();
     if( row + 1 != SCREEN_LENGTH) {
         col = 0;
         row++;
@@ -25,8 +48,11 @@ void newline() {
         oneline_up();
         col = 0;
     }
+    setPicMasks(0xFC, 0xFF);
 }
 void backspace() {
+    setPicMasks(0xFD, 0xFF);
+    clear_blink();
     if( col - 1 >= 0) {
         col--;
         set_pos(row, col, SET_CHAR(' '));
@@ -35,6 +61,7 @@ void backspace() {
         col = SCREEN_WIDTH - 1;
         set_pos(row, col, SET_CHAR(' '));
     }
+    setPicMasks(0xFC, 0xFF);
 }
 
 void show_vscreen() {
@@ -72,10 +99,10 @@ void print_chr(char c) {
     increment_pos();
 }
 
-void print_str(char* s) {
+void print_str(const char* s) {
     unsigned int i = 0;
 
-    for( i = 0; s[i] < '\0'; i++ ) {
+    for( i = 0; s[i] != '\0'; i++ ) {
         print_chr(s[i]);
     }
 }
