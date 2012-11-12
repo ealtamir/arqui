@@ -1,8 +1,6 @@
-#include "../../include/c/interrupciones/definiciones.h"
 #include "../../include/c/definiciones.h"
-#include "../../include/c/interrupciones/helpers.h"
-#include "../../include/c/helpers.h"
 #include "../../include/c/primitivas.h"
+#include "../../include/c/video.h"
 
 /***************************************************************
 *
@@ -19,6 +17,26 @@ void set_col(unsigned int lcol) { col = lcol; }
 int get_row(unsigned int lrow) { return row; }
 int get_col(unsigned int lcol) { return col; }
 
+void newline() {
+    if( row + 1 != SCREEN_LENGTH) {
+        col = 0;
+        row++;
+    } else {
+        oneline_up();
+        col = 0;
+    }
+}
+void backspace() {
+    if( col - 1 >= 0) {
+        col--;
+        set_pos(row, col, SET_CHAR(' '));
+    } else if ( row > 0 ) {
+        row--;
+        col = SCREEN_WIDTH - 1;
+        set_pos(row, col, SET_CHAR(' '));
+    }
+}
+
 void show_vscreen() {
     int i = 0;
     for(i = 0; i < 70; i++) {
@@ -31,9 +49,7 @@ void set_pos(int row, int col, word w) {
         virtual_screen[row][col] = w;
     }
 }
-
-void print_chr(char c) {
-    set_pos(row, col, (word)SET_CHAR(c));
+void increment_pos() {
     if(col < SCREEN_WIDTH) {
         col++;
     } else if (row < SCREEN_LENGTH) {
@@ -42,6 +58,18 @@ void print_chr(char c) {
     } else {
         // do something else
     }
+    if (col == SCREEN_WIDTH) {
+        col = 0;
+        row++;
+    } else if (row == SCREEN_LENGTH) {
+        oneline_up();
+        row = SCREEN_LENGTH - 1;
+    }
+}
+
+void print_chr(char c) {
+    set_pos(row, col, (word)SET_CHAR(c));
+    increment_pos();
 }
 
 void print_str(char* s) {

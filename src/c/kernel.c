@@ -32,8 +32,19 @@ void kmain() {
     putc_custom(' ');
     putc_custom(' ');
 
-    //show_vscreen();
-    
+    fill_screen('&');
+    print_vscreen();
+    char c = 0;
+    set_col(20);
+    set_row(0);
+    while(1) {
+        c = getc();
+        
+        if( c == '\b' ) {
+            backspace();
+            print_vscreen();
+        }
+    }
 
     while(1) {}
 
