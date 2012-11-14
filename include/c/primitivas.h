@@ -60,6 +60,7 @@ size_t __read(int fd, void* buffer, size_t count);
 ****************************************************************/
 // TODO: Sacar esto y escribir un controlador de video apropiado.
 void reset_tickpos();
+void set_tickpos(unsigned int row, unsigned int col);
 
 /***************************************************************
 *   void fflush

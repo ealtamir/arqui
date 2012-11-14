@@ -68,11 +68,11 @@ void int_09(unsigned char scancode) {
             r_shift_pressed = false;
         break;
         case PRINT_KBUFFER:
-            i = 0;
-            while(i < KEYBOARD_BUFFER_SIZE) {
-                putc_custom(keypressed_buffer[i++]);
-            }
-            printf_custom(" %d ", write_kbuffer_ptr);
+            set_tickpos(10, 40);
+            int row = get_row();
+            int col = get_col();
+
+            printf_custom("%d %d", row, col);
         break;
         default:
             keys = (l_shift_pressed || r_shift_pressed) ? 

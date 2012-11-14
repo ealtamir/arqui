@@ -14,19 +14,22 @@
 #define SCREEN_SIZE         SCREEN_WIDTH * SCREEN_LENGTH * CHAR_SIZE
 
 // Atributo de video. Letras blancas, fondo negro
-#define WHITE_TXT           0x0007 
-#define SPACE               0x2000
-#define EMPTY_SPACE         ((WHITE_TXT << 0x08) | (SPACE >> 0x08))
-#define SET_CHAR(c)         ((WHITE_TXT << 0x08) | (c))
+#define WHITE_TXT               0x0007 
+#define SPACE                   0x2000
+#define EMPTY_SPACE             ((WHITE_TXT << 0x08) | (SPACE >> 0x08))
+#define SET_CHAR(c)             ((WHITE_TXT << 0x08) | (c))
 #define BLINK_COLOR             0x78
 #define SET_CHAR_BLINK_ON(c)    ((BLINK_COLOR) << 0x08 | (c))
 #define POINTER_BLINK_SPEED     10
-#define OS_PID	            0
+#define OS_PID	                0
 
 // File Descriptors POSIX.
 #define STDIN               0
 #define STDOUT              1
 #define STDERR              2
+
+// File Descriptors custom.
+#define VCONSOLE            3
 
 /*************************************************************
  *
@@ -40,6 +43,9 @@ typedef int dword;
 typedef int size_t;
 typedef short int ssize_t;
 
+typedef unsigned short          multiboot_uint16_t;
+typedef unsigned int            multiboot_uint32_t;
+typedef unsigned long long      multiboot_uint64_t;
 
 /*************************************************************
  *
@@ -125,6 +131,26 @@ typedef struct {
     word  limit;
     dword base;
 } IDTR;
+
+struct multiboot_aout_symbol_table
+ {
+   multiboot_uint32_t tabsize;
+   multiboot_uint32_t strsize;
+   multiboot_uint32_t addr;
+   multiboot_uint32_t reserved;
+ };
+ typedef struct multiboot_aout_symbol_table multiboot_aout_symbol_table_t;
+     
+/* The section header table for ELF. */
+struct multiboot_elf_section_header_table
+{
+  multiboot_uint32_t num;
+  multiboot_uint32_t size;
+  multiboot_uint32_t addr;
+  multiboot_uint32_t shndx;
+};
+typedef struct multiboot_elf_section_header_table multiboot_elf_section_header_table_t;
+
 
 
 /*************************************************************

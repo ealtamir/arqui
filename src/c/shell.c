@@ -13,7 +13,8 @@
 int shell() {
     const char *prompt = "#> ";
     char c = 0;
-    char input_buffer[128];
+    // 3 por la longitud del prompt.
+    char input_buffer[SCREEN_WIDTH - 4]; //TODO: MAGIC NUMBER
     unsigned int prompt_len = strlen_custom(prompt);
     unsigned int i = 0;
 
@@ -31,7 +32,7 @@ int shell() {
         c = '\0';
         while( c != '\n' ) {
             c = getc();
-            if( isalpha(c) == true && i < sizeof(input_buffer)  ) {
+            if( (isalpha(c) == true || c == ' ') && i < sizeof(input_buffer)  ) {
                 print_chr(c);
                 input_buffer[i] = c;
                 i++;
@@ -44,6 +45,8 @@ int shell() {
             }
         }
         newline();
+        i = 0;
+        memset_custom(input_buffer, sizeof(input_buffer), '\0');
     }
     return 0;
 }

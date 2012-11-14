@@ -52,8 +52,8 @@ void initInterrupts(DESCR_INT *idt, int size) {
     // Cargo los descriptores en la IDT
     // Debido a que el PIC1 está mapeado a partir de la interrupción
     // 8, empiezo a definir mis rutinas ahí.
-    setup_IDT_entry(&idt[8], 8, (dword) &_int_08_hand, ACS_INT, 0);
-    setup_IDT_entry(&idt[9], 8, (dword) &_int_09_hand, ACS_INT, 0);
+    setup_IDT_entry(&idt[8], 0x08, (dword) &_int_08_hand, ACS_INT, 0);
+    setup_IDT_entry(&idt[9], 0x08, (dword) &_int_09_hand, ACS_INT, 0);
 
     idtr.base = 0;
     idtr.base += (dword)idt;

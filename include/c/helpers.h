@@ -30,14 +30,6 @@ void wait(unsigned int time);
 
 
 /***************************************************************
- *   k_clear_screen
- *       Borra la pantalla utilizando WHITE_TXT como color.
- *
-****************************************************************/
-void k_clear_screen();
-
-
-/***************************************************************
 *   void memset_custom
 *       Recibe un puntero a void y a partir de ese puntero setea
 *           'size' cantidad de bytes con 'value'.
@@ -82,6 +74,14 @@ int getc();
 
 
 /***************************************************************
+*   int vprintf_custom
+*
+*
+****************************************************************/
+int vprintf_custom(char *format, ... );
+
+
+/***************************************************************
 *   int scanf
 *
 *
@@ -106,6 +106,14 @@ int scanf(const char *format, ... );
 ****************************************************************/
 int fputc(int c, FILE *stream);
 
+
+/***************************************************************
+*   int vputc_custom
+*       Coloca un caracter en la consola virtual
+*
+****************************************************************/
+int vputc_custom(int c);
+
 /***************************************************************
 *   int printf
 *       Convierte, formatea e imprime la cadena de caracteres 
@@ -122,6 +130,14 @@ int fputc(int c, FILE *stream);
 ****************************************************************/
 int printf_custom(char *format, ... );
 
+/***************************************************************
+*   int vprintf_custom
+*
+*
+****************************************************************/
+int vprintf_custom(char *format, ... );
+
+
 /****************************************************************
 *   FILE get_stdout
 *       Devuelve una estructura que representa el stdout.      
@@ -136,6 +152,14 @@ FILE get_stdout();
 *
 ****************************************************************/
 FILE get_stdin();
+
+/****************************************************************
+*   FILE get_vconsole
+*       Devuelve una estructura que representa el stream de
+*           la consola virtual utilizada por video.c.      
+*
+****************************************************************/
+FILE get_vconsole();
 
 /***************************************************************
  * unsigned int _read_msw

@@ -3,6 +3,7 @@
 #include "../../include/c/primitivas.h"
 #include "../../include/c/stdlibs/ctype.h"
 #include "../../include/c/stdlibs/string.h"
+#include "../../include/c/video.h"
 
 /***************************************************************
  *
@@ -52,32 +53,8 @@ int fprintf_custom(FILE *stream, char *format, va_list *args);
 int fscanf_custom(FILE *stream, const char *format, va_list *args);
 int process_int(int fd, Format format_spec, va_list* args);
 int process_str(int fd, Format format_spec, va_list* args);
-
-/***************************************************************
-*   k_clear_screen
-*       Borra la pantalla en modo texto color.
-*
-****************************************************************/
-void k_clear_screen() 
-{
-	unsigned int i = 0;
-    int whitespace = ' ';
-    int result = 0;
-
-    // TODO: Sacar esta función y utilizar un buffer a la pantalla.
-    reset_tickpos();
-
-    for (i = 0; i < SCREEN_LENGTH * SCREEN_WIDTH; i++) {
-        result = putc_custom(whitespace);
-        // TODO:
-        //if (result == error) {
-        //    // Do something.
-        //}
-    }
-
-    reset_tickpos();
-}
-
+int process_unsgn(int fd, Format format_spec, va_list* args);
+int process_hex(int fd, Format format_spec, va_list* args);
 
 /***************************************************************
 *   void memset_custom
@@ -187,6 +164,15 @@ int putc_custom(int c) {
     return fputc(c, &stdout);
 }
 
+/***************************************************************
+*   int vputc_custom
+*   
+*
+****************************************************************/
+int vputc_custom(int c) {
+    FILE vconsole = get_vconsole();
+    return fputc(c, &vconsole);
+}
 
 /***************************************************************
 *   int fputc
@@ -206,16 +192,24 @@ int putc_custom(int c) {
 int fputc(int c, FILE *stream) {
     int fd = stream->fd;    // STDOUT por lo general.
     int count = 1;
+    int result = 0;
     char whitespace = WHITE_TXT;
 
     unsigned char new_char = (unsigned char) c;
 
-    int result = __write(fd, (const void*) &c, count);
-    // TODO:
-    // if (result != count) {
-    //     // Do Something 
-    // }
-    result = __write(fd, (const void*) &whitespace, count);
+    switch(fd) {
+        case STDOUT:
+            result = __write(fd, (const void*) &c, count);
+            // TODO:
+            // if (result != count) {
+            //     // Do Something 
+            // }
+            result = __write(fd, (const void*) &whitespace, count);
+        break;
+        case VCONSOLE:
+            print_chr((char)c);
+        break;
+    }
     return result;
 }
 
@@ -259,7 +253,7 @@ int fprintf_custom(FILE *stream, char *format, va_list *args) {
             );
 
         } else {
-            putc_custom(format[i]);
+            fputc(format[i], stream);
             printd_chars++;
         }
     }
@@ -292,6 +286,23 @@ int printf_custom(char *format, ... ) {
     va_end(args);
 
     return printed_chars;
+}
+
+/***************************************************************
+*   int vprintf_custom
+*       Imprime el string en la consola virtual definida en
+*           el archivo video.c
+****************************************************************/
+int vprintf_custom(char *format, ... ) {
+    int printd_chars = 0;
+    va_list args;
+
+    va_start(args, format);
+    FILE vconsole = get_vconsole();
+    printd_chars = fprintf_custom(&vconsole, format, &args);
+    va_end(args);
+
+    return printd_chars;
 }
 
 
@@ -397,6 +408,7 @@ unsigned int  process_params(
 ) {
     unsigned int chars_num = 0;     // Chars impresos o leídos.
 
+
     switch(format) {
         case 'd':case 'i':  // integer
             chars_num = process_int(stream->fd, format_spec, args);
@@ -404,8 +416,10 @@ unsigned int  process_params(
         case 'o':           // unsigned octal number
             break;
         case 'x': case 'X': // Prints in hex
+            chars_num = process_hex(stream->fd, format_spec, args);
             break;
         case 'u':           // unsigned decimal number
+            chars_num = process_unsgn(stream->fd, format_spec, args);
             break;
         case 'c':           // single character
             break;
@@ -426,35 +440,87 @@ unsigned int  process_params(
     }
     return chars_num;
 }
-
-int process_int(int fd, Format format_spec, va_list* args) {
-    int num = 0;
+int process_hex(int fd, Format format_spec, va_list* args) {
     char num_str[20];
+    unsigned int len = 0;
+    unsigned int num = 0;
+
+    memset_custom(num_str, sizeof(num_str), '\0');
+    num = va_arg(*args, unsigned int);
+    toHex(num, num_str, 1);
 
     switch(fd) {
         case STDOUT:
-            num = va_arg(*args, int);
-            itoa(num, num_str, sizeof(num_str));
             printstr(num_str);
-            return strlen_custom(num_str);
+            len = strlen_custom(num_str);
         break;
-        case STDIN:
+        case VCONSOLE:
+            print_str(num_str);
+            len = strlen_custom(num_str);
         break;
     }
+    return len;
+}
+
+int process_unsgn(int fd, Format format_spec, va_list* args) {
+    unsigned int num = 0;
+    unsigned int len = 0;
+    char num_str[20];
+
+    memset_custom(num_str, sizeof(num_str), '\0');
+    num = va_arg(*args, unsigned int);
+    itoa(num, num_str, sizeof(num_str));
+
+    switch(fd) {
+        case STDOUT:
+            printstr(num_str);
+            len = strlen_custom(num_str);
+        break;
+        case VCONSOLE:
+            print_str(num_str);
+            len = strlen_custom(num_str);
+        break;
+    }
+    return len;
+}
+int process_int(int fd, Format format_spec, va_list* args) {
+    int num = 0;
+    unsigned int len = 0;
+    char num_str[20];
+
+    memset_custom(num_str, sizeof(num_str), '\0');
+    num = va_arg(*args, int);
+    itoa(num, num_str, sizeof(num_str));
+
+    switch(fd) {
+        case STDOUT:
+            printstr(num_str);
+            len = strlen_custom(num_str);
+        break;
+        case VCONSOLE:
+            print_str(num_str);
+            len = strlen_custom(num_str);
+        break;
+    }
+    return len;
 }
 
 int process_str(int fd, Format format_spec, va_list* args) {
     char* str = 0;
+    unsigned int len = 0;
+    str = va_arg(*args, char* );
     
     switch(fd) {
         case STDOUT:
-            str = va_arg(*args, char* );
             printstr(str);
-            return strlen_custom(str);
+            len = strlen_custom(str);
         break;
-        case STDIN:
+        case VCONSOLE:
+            print_str(str);
+            len = strlen_custom(str);
         break;
     }
+    return len;
 }
 
 /****************************************************************
@@ -478,6 +544,8 @@ FILE get_stdout() {
     FILE stdout = { STDOUT, 0, 0 };
     return stdout;
 }
+
+
 /****************************************************************
 *   FILE get_stdout
 *       Devuelve una estructura que representa el stdout.      
@@ -486,6 +554,17 @@ FILE get_stdout() {
 FILE get_stdin() {
     FILE stdin = { STDIN, 0, 0 };
     return stdin;
+}
+
+
+/****************************************************************
+*   FILE get_stdout
+*       Devuelve una estructura que representa el stdout.      
+*
+****************************************************************/
+FILE get_vconsole() {
+    FILE vconsole = { VCONSOLE, 0, 0 };
+    return vconsole;
 }
 
 void __stack_chk_fail(void) {

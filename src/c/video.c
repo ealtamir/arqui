@@ -50,6 +50,14 @@ void newline() {
     }
     setPicMasks(0xFC, 0xFF);
 }
+
+void times_newline(unsigned int i) {
+    while(i > 0) {
+        newline();
+        i--;
+    }
+}
+
 void backspace() {
     setPicMasks(0xFD, 0xFF);
     clear_blink();

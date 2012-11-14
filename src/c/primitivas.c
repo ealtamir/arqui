@@ -123,6 +123,11 @@ size_t __read(int fd, void* buffer, size_t count) {
 void reset_tickpos() {
     tickpos = 0;
 }
+void set_tickpos(unsigned int row, unsigned int col) {
+    if( row < SCREEN_LENGTH && col < SCREEN_WIDTH ) {
+        tickpos = row * SCREEN_WIDTH * 2 + col * 2;
+    }
+}
 
 /***************************************************************
 *   void write_to_screen

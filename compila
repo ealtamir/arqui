@@ -16,5 +16,6 @@ gcc -m32 -c ../src/c/stdlibs/string.c -o c_stdlibs_string.o -fno-builtin
 gcc -m32 -c ../src/c/stdlibs/ctype.c -o c_stdlibs_ctype.o -fno-builtin
 gcc -m32 -c ../src/c/video.c -o c_video.o -fno-builtin
 gcc -m32 -c ../src/c/shell.c -o c_shell.o -fno-builtin
+gcc -m32 -c ../src/c/malloc.c -o c_malloc.o -fno-builtin
 
-ld -T ../src/asm/link.ld -o kernel.bin asm_helpers.o asm_int_handlers.o asm_int_helpers.o asm_kstart.o c_int_helpers.o c_int_funciones_de_atencion.o c_helpers.o c_kernel.o c_primitivas.o c_stdlibs_string.o c_stdlibs_ctype.o c_video.o c_shell.o
+ld -T ../src/asm/link.ld -o kernel.bin asm_helpers.o asm_int_handlers.o asm_int_helpers.o asm_kstart.o c_int_helpers.o c_int_funciones_de_atencion.o c_helpers.o c_kernel.o c_primitivas.o c_stdlibs_string.o c_stdlibs_ctype.o c_video.o c_shell.o c_malloc.o

@@ -30,5 +30,14 @@ unsigned int strlen_custom(const char* str);
 void itoa(int value, char *sp, int buff_size);
 
 
+/****************************************************************
+*   void itoa
+*       Devuelve la representación en ASCII de un dígito que se le
+*           pasa como parámetro.
+*
+****************************************************************/
+void toHex(int d, char* str, int debug);
+
+
 /****************************************************************/
 #endif
