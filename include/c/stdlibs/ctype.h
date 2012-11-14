@@ -15,6 +15,7 @@ bool islower(int c);
 bool isdigit(int c);
 bool isalpha(int c);
 bool isalnum(int c);
+bool ishex(int c);
 
 
 /****************************************************************/

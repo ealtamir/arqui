@@ -1,4 +1,5 @@
 #include "../../../include/c/stdlibs/string.h"
+#include "../../../include/c/stdlibs/ctype.h"
 #include "../../../include/c/definiciones.h"
 #include "../../../include/c/helpers.h"
 
@@ -77,6 +78,29 @@ void itoa(int value, char *sp, int buff_size) {
     while (tp > tmp) {
         *sp++ = *--tp; // pongo en el orden correcto el número.
     }
+}
+
+unsigned int htoi(const char* hex_str) {
+    char c = '\0';
+    unsigned int len = 0;
+    unsigned int result = 0;
+    unsigned int multiplier = 1;
+    
+    // Posición del último dígito del string
+    len = strlen_custom(hex_str) - 1;
+    
+    // Espero que la cadena empiece por 0x o 0X.
+    while( len >= 2 ) {
+        c = hex_str[len];
+        if(isalpha(c) == true) {
+            result += (c + 10 - ((islower(c))? 'a': 'A'))*multiplier;
+        } else {
+            result += (c - '0')*multiplier;
+        }
+        multiplier *= 16;
+        len--;
+    }
+    return result;
 }
 
 /****************************************************************

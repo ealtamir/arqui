@@ -21,7 +21,6 @@ extern unsigned int user_memory_size;
 *
 ****************************************************************/
 void kmain(multiboot_info_t* mbd, unsigned int magic) {
-    DESCR_INT idt[IDT_SIZE];	    // Creo la IDT.
 
     // Borro la pantalla
     clear_vscreen();

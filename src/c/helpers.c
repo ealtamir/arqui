@@ -47,15 +47,27 @@ unsigned int parse_fspecifier(
     Format* format_spec
 );
 
+unsigned int parse_scan(
+    char format,
+    char* current_param,
+    va_list *args
+);
+
 void __stack_chk_fail(void);
 void printstr(char *s);
 int fprintf_custom(FILE *stream, char *format, va_list *args);
 int fscanf_custom(FILE *stream, const char *format, va_list *args);
+int sscanf_custom(const char* s, const char* format, va_list *args);
 int process_int(int fd, Format format_spec, va_list* args);
 int process_str(int fd, Format format_spec, va_list* args);
 int process_unsgn(int fd, Format format_spec, va_list* args);
 int process_hex(int fd, Format format_spec, va_list* args);
 
+// Funciones relacionadas a fscanf_custom.
+unsigned int scan_int(char* current_param, va_list *args);
+unsigned int scan_hex(char* current_param, va_list *args);
+unsigned int scan_char(char* current_param, va_list *args);
+unsigned int scan_str(char* current_param, va_list *args);
 /***************************************************************
 *   void memset_custom
 *       Recibe un puntero a void y a partir de ese puntero setea
@@ -102,7 +114,45 @@ int getc() {
     return fgetc(&stdin);
 }
 
+int sscanf_custom(const char* s, const char* format, va_list *args) {
+    char c = '\0';
+    char d = '\0';
+    char current_param[64];
+    unsigned int i = 0;     
+    unsigned int j = 0;     
+    unsigned int k = 0;     
+    unsigned int len = 0;
+    unsigned int input_converted = 0;
 
+    len = strlen_custom(format);
+
+    for(i = 0, j = 0; i < len; i++, j++) {
+        c = format[i];
+        d = s[j];
+        if( c == '%' ) {
+            while(s[j] != ' ' 
+                    && s[j] != '\0' 
+                    && k < sizeof(current_param) - 1) {
+                current_param[k] = s[j];
+                k++;
+                j++;
+            }
+            current_param[k] = '\0';
+            k = 0;
+            i++;
+            input_converted += parse_scan(format[i], current_param,  args);
+            memset_custom(current_param, sizeof(current_param), '\0');
+            i++; // i está en el espacio después de %*
+
+        } else if (c == d) {
+            // Keep reading format...
+        } else {
+            return 0;
+        }
+    }
+    return input_converted;
+
+}
 /***************************************************************
 *   int scanf
 *
@@ -111,23 +161,124 @@ int getc() {
 int fscanf_custom(FILE *stream, const char* format, va_list *args) {
     char c = '\0';
     char input[256];
-    unsigned int buffer_size = 0;
-    unsigned int i = 0;     
+    unsigned int input_converted = 0;
+    unsigned int i = 0;
     
-    buffer_size = sizeof(input);
     memset_custom(input, sizeof(input), '\0');
 
     while(i < sizeof(input) && c != '\n') {
         c = getc(); 
+        fputc(c, stream);
         input[i] = c;
         i++;
     }
     // Reemplazo el último caracter por \0.
     input[i-1] = '\0' ;
-    printf_custom("%s", input);
-    return i - 1; // Resto porque dejo i adelantado.
-
+    return sscanf_custom(input, format, args);
 }
+
+unsigned int parse_scan(
+    char format,
+    char* current_param,
+    va_list *args
+) {
+    unsigned int ret_val = 0;
+    unsigned int i = 0;     // Chars impresos o leídos.
+    bool leave = false;
+
+
+    switch(format) {
+        case 'd':case 'i':  // integer
+            ret_val += scan_int(current_param, args);
+            break;
+        case 'o':           // unsigned octal number
+            break;
+        case 'x': case 'X': // Prints in hex
+            ret_val += scan_hex(current_param, args);
+            break;
+        case 'u':           // unsigned decimal number
+            break;
+        case 'c':           // single character
+            ret_val += scan_char(current_param, args);
+            break;
+        case 's':           // \0 terminated string
+            ret_val += scan_str(current_param, args);
+            break;
+        case 'f':           // double
+            break;
+        case 'e':case 'E':  // double exp notation
+            break;
+        case '%':           // prints %
+            break;
+        case '.':
+            break;
+        default:
+            // TODO: STOP EXECUTION.
+            break;
+    }
+    return ret_val;
+}
+
+unsigned int scan_int(char* current_param, va_list *args) {
+    bool leave = false;
+    unsigned int i = 0;
+    unsigned int ret_val = 0;
+
+    for(i = 0; current_param[i] != '\0'; i++) {
+        if(isalpha(current_param[i]) == true) {
+            leave = true;
+        }
+    }
+    if( leave == false ) {
+        int* d = va_arg(*args, int*);
+        *d = atoi(current_param);
+        ret_val += 1;
+    }
+    return ret_val;
+}
+
+unsigned int scan_hex(char* current_param, va_list *args) {
+    bool leave = false;
+    unsigned int i = 0;
+    unsigned int ret_val = 0;
+
+    if( current_param[0] == '0' 
+            && (current_param[1] == 'x' || current_param[1] == 'X')) {
+        for(i = 0; current_param[i] != '\0'; i++) {
+            if(ishex(current_param[i]) == false) {
+                leave = true;
+                break;
+            }
+        }
+        if( leave == false ) {
+            unsigned int* h = va_arg(*args, unsigned int*);
+            *h = htoi(current_param);
+            ret_val += 1;
+        }
+    }
+    return ret_val;
+}
+
+unsigned int scan_char(char* current_param, va_list *args) {
+    char* c = 0;
+
+    c = va_arg(*args, char*);
+    *c = current_param[0];
+    return 1;
+}
+
+unsigned int scan_str(char* current_param, va_list *args) {
+    unsigned int i = 0;
+
+    char* str = va_arg(*args, char*);
+    while(current_param[i] != '\0') {
+        str[i] = current_param[i];
+        i++;
+    }
+    str[i] = '\0';
+    return 1;
+}
+
 
 
 /***************************************************************

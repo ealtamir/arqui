@@ -39,5 +39,6 @@ void itoa(int value, char *sp, int buff_size);
 void toHex(int d, char* str, int debug);
 
 
+unsigned int htoi(const char* hex_str);
 /****************************************************************/
 #endif

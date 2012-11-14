@@ -6,6 +6,9 @@
  *                      FUNCIONES 
  *
 ****************************************************************/
+
+DESCR_INT idt[IDT_SIZE];	    // Creo la IDT.
+
 /***************************************************************
 *   setup_IDT_entry
 *   Inicializa un descriptor de la IDT
@@ -41,7 +44,7 @@ void setup_IDT_entry(
  *      Un puntero a la IDT.       
  *
 ****************************************************************/
-void initInterrupts(DESCR_INT *idt, int size) {
+void initInterrupts() {
 
     byte i = 0;  // Lo uso como índice.
     IDTR idtr;  // Para cargar el IDTR.
@@ -81,4 +84,9 @@ void setPicMasks(byte pic1_mask, byte pic2_mask) {
         
     // Vuelvo a habilitar las interrupciones
 	_Sti();
+}
+
+
+DESCR_INT* get_idt() {
+    return idt;
 }

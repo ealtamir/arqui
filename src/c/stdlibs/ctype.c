@@ -32,7 +32,13 @@ bool isalpha(int c) {
 
 
 bool isalnum(int c) {
-    return (isalpha(c) && isdigit(c)) ? true : false;
+    return (isalpha(c) || isdigit(c)) ? true : false;
+}
+
+bool ishex(int c) {
+    return ( ('A' <= c && 'Z' >= c)
+            || ('a' <= c && 'z' >= c)
+            || isdigit(c)) ? true : false;
 }
 
 
