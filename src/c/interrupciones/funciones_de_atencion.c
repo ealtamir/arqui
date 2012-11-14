@@ -5,6 +5,7 @@
 #include "../../../include/c/stdlibs/string.h"
 #include "../../../include/c/helpers.h"
 #include "../../../include/c/video.h"
+#include "../../../include/c/shell.h"
 
 
 /***************************************************************
@@ -91,6 +92,11 @@ void int_09(unsigned char scancode) {
 }
 
 void int_00() {
+    clear_vscreen();
+    set_col(4); set_row(4);
+    vprintf_custom("Intentaste dividir por 0...");
+    print_vscreen();
+    q_to_continue(4, 10, 1);
 }
 void int_01() {
 }

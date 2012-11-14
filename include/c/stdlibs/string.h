@@ -11,6 +11,14 @@
 *       Devuelve la representación decimal de un número en ASCII.
 *
 ****************************************************************/
+int strcmp(const char *s1, const char *s2);
+
+
+/****************************************************************
+*   unsigned int atoi
+*       Devuelve la representación decimal de un número en ASCII.
+*
+****************************************************************/
 unsigned int atoi(const char *s);
 
 

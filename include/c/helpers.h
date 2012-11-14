@@ -8,9 +8,13 @@
 
 #include "definiciones.h"
 
-#ifndef WHITE_TXT
-#define WHITE_TXT 0x07 
-#endif
+
+#define va_start(v,l) __builtin_va_start(v,l)
+#define va_arg(v,l)   __builtin_va_arg(v,l)
+#define va_end(v)     __builtin_va_end(v)
+#define va_copy(d,s)  __builtin_va_copy(d,s)
+
+typedef __builtin_va_list va_list;
 
 /***************************************************************
 *   void showSplashScreen
@@ -88,6 +92,36 @@ int vprintf_custom(char *format, ... );
 ****************************************************************/
 int scanf(const char *format, ... );
 
+/***************************************************************
+*   int fprintf_custom
+*
+*
+****************************************************************/
+//int fprintf_custom(FILE *stream, char *format, va_list *args);
+
+
+/***************************************************************
+*   int fscanf_custom
+*
+*
+****************************************************************/
+//int fscanf_custom(FILE *stream, const char *format, va_list *args);
+
+
+/***************************************************************
+*   int vsscanf_custom
+*
+*
+****************************************************************/
+//int vsscanf_custom(const char* s, const char* format, va_list *args);
+
+
+/***************************************************************
+*   int sscanf_custom
+*
+*
+****************************************************************/
+//int sscanf_custom(const char* s, const char* format, ...);
 
 /***************************************************************
 *   int fputc
@@ -113,6 +147,7 @@ int fputc(int c, FILE *stream);
 *
 ****************************************************************/
 int vputc_custom(int c);
+
 
 /***************************************************************
 *   int printf
@@ -167,5 +202,9 @@ FILE get_vconsole();
 ****************************************************************/
 unsigned int _read_msw();
 
+int vsscanf_custom(const char* s, const char* format, va_list *args);
+int sscanf_custom(const char* s, const char* format, ...);
+int fscanf_custom(FILE *stream, const char *format, va_list *args);
+int fprintf_custom(FILE *stream, char *format, va_list *args);
 
 #endif

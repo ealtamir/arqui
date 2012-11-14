@@ -1,12 +1,24 @@
 #include "../../include/c/malloc.h"
 #include "../../include/c/helpers.h"
 #include "../../include/c/video.h"
+#include "../../include/c/stdlibs/string.h"
+#include "../../include/c/stdlibs/ctype.h"
+#include "../../include/c/shell.h"
+#include "../../include/c/tests.h"
 
-#define SAFE_ADDRESS    (1024*1024*2)
+#define SAFE_ADDRESS        (1024*1024*2)
+#define INFO_TABLE_SIZE     50 
 
 typedef struct {
     unsigned int* ptr_to_segment_start;
 } memory_segment;
+
+typedef struct {
+    void* ptr;
+    unsigned int size;
+} alloc_memory;
+
+alloc_memory info[INFO_TABLE_SIZE];
 
 unsigned int system_memory_size = 0;
 unsigned int user_memory_size = 0;
@@ -55,16 +67,6 @@ void* malloc_custom(unsigned int size, int debug) {
             first_found = next_segment;
             next_segment = &first_found[0];
             accumulated_mem += minimum_segment_size;
-            //if(debug == 1) {
-            //    set_col(0); set_row(0);
-            //    vprintf_custom("min size: %d, accumulated_mem: %d, next_segment: %x, pos: %x", minimum_segment_size, accumulated_mem, next_segment, &accumulated_mem);
-            //    print_vscreen();
-            //}
-
-
-            // Mientras no haya acumulado la memoria que pide el usuario
-            // y aún siga dentro de la memoria del registro y el 
-            // próximo segmento también esté libre.
             while(size > accumulated_mem 
                     && (void*)next_segment < (void*)user_space_start 
                     && next_segment->ptr_to_segment_start == 0) {
@@ -72,44 +74,16 @@ void* malloc_custom(unsigned int size, int debug) {
                 i++;
                 next_segment++;
             }
-            //if(debug == 1) {
-            //    set_col(0); set_row(1);
-            //    vprintf_custom("min size: %d, accumulated_mem: %d, next_segment: %x", minimum_segment_size, accumulated_mem, next_segment);
-            //    print_vscreen();
-            //    while(1) {}
-            //}
 
             if( size <= accumulated_mem ) {
                 return_ptr = (void*)(user_space_start + starting_index*minimum_segment_size);
                 last_found = &next_segment[-1]; // Último que encontré
                 next_segment = first_found;
                 allocated_space += accumulated_mem - minimum_segment_size;
-                //if(debug == 1) {
-                //    set_col(0); set_row(1);
-                //    vprintf_custom("first found: %x, last found: %x, return ptr: %x, starting index: %d", first_found, last_found, return_ptr, starting_index );
-                //    print_vscreen();
-                //    while(1) {}
-                //}
                 while( next_segment <= last_found ) {
                     next_segment->ptr_to_segment_start = return_ptr;
                     next_segment++;
                 }
-                //if(debug == 1) {
-                //    next_segment = first_found;
-                //    while( next_segment <= last_found ) {
-                //        if( next_segment->ptr_to_segment_start != return_ptr) {
-                //            set_row(10);
-                //            vprintf_custom("FALLO - next segment: %x", next_segment);
-                //            print_vscreen();
-                //            while(1) {}
-                //        }
-                //        next_segment++;
-                //    }
-                //    set_row(10);
-                //    vprintf_custom("FUNCIONO");
-                //    print_vscreen();
-                //    while(1) {}
-                //}
                 return return_ptr;
             } else if((void*)next_segment >= (void*)user_space_start) {
                 // No hay memoria disponible.
@@ -129,7 +103,7 @@ void* malloc_custom(unsigned int size, int debug) {
 * void free
 *
 ****************************************************************/
-void free(unsigned int* ptr) {
+void* free(unsigned int* ptr) {
     unsigned int i = 0;
     memory_segment* first_found = 0;
     memory_segment* last_found = 0;
@@ -142,9 +116,17 @@ void free(unsigned int* ptr) {
                 allocated_space -= minimum_segment_size;
                 i++;
             }
-            break;
+            for( i = 0; i < INFO_TABLE_SIZE; i++ ) {
+                if( info[i].ptr == ptr ) {
+                    info[i].ptr = 0;
+                    info[i].size = 0;
+                    break;
+                }
+            }
+            return ptr;
         }
     }
+    return 0;
 }
 
 
@@ -164,6 +146,8 @@ void init_malloc_data() {
     unsigned int i = 0;
     unsigned int table_size = 0;
     unsigned int check = 0;
+
+    memset_custom((char*)info, sizeof(info), 0);
     
     // Aloco el 10% de mi memoria total para mi 
     // registro de headers de memoria.
@@ -199,13 +183,14 @@ void init_malloc_data() {
         vprintf_custom("Memory Header Size: %x", sizeof(memory_segment));
         print_vscreen();
     }
+
+    q_to_continue(SCREEN_LENGTH - 1, 2, 1);
 }
 
 
 /***************************************************************
 *   void init_mem
-*       calculates the amount of RAM in memory
-*
+*       Calcula la cantidad de RAM que tiene la máquina.
 *
 ****************************************************************/
 unsigned int init_mem(multiboot_info_t* mbd) {
@@ -223,4 +208,128 @@ unsigned int init_mem(multiboot_info_t* mbd) {
     }
 
     system_memory_size = (unsigned int)(largest_len);
+}
+
+/***************************************************************
+*   void malloc_command
+*       Calcula la cantidad de RAM que tiene la máquina.
+*
+****************************************************************/
+void malloc_command(char* params) {
+    char option[20];
+    unsigned int size = 0;
+    unsigned int i = 0;
+
+    memset_custom(option, sizeof(option), 0);
+
+    sscanf_custom(params, "%s %d", option, &size);
+
+    if( strcmp(option, "get") == 0 ) {
+        if( size > minimum_segment_size ) {
+            void* ptr = malloc_custom(size, 0);
+            newline();
+            if(ptr == 0) {
+                vprintf_custom("No hay espacio para alocar %d bytes.", size);
+            } else {
+                for(i = 0; info[i].ptr != 0; i++) {}
+
+                if( i < INFO_TABLE_SIZE ) {
+                    vprintf_custom("Se aloco la memoria. Esta en la direccion %x", ptr);
+
+                    info[i].ptr = ptr;
+                    info[i].size = size;
+                } else {
+                    newline();
+                    vprintf_custom("No puedes alocar mas memoria porque llenaste la"
+                            "tabla que tiene las referencias de las alocaciones, y que"
+                            "usa el comando malloc info.");
+                }
+            }
+        } else {
+            newline();
+            vprintf_custom("Debes pedir %d bytes o mas.", minimum_segment_size);
+        }
+    } else if( strcmp(option, "info") == 0) {
+        clear_vscreen();
+        set_col(2); set_row(1);
+        vprintf_custom("Los valores de la izquierda son la direcciones "
+                "en donde empieza cada segmento, los de la derecha son los "
+                "tamanos de los mismos.");
+        set_col(2); set_row(3);
+        for(i = 0; i < INFO_TABLE_SIZE; i++) {
+            if( info[i].ptr != 0 ) {
+                set_col(2);
+                vprintf_custom("%x %d", info[i].ptr, info[i].size);
+                newline();
+                if( i > SCREEN_WIDTH - 3 ) {
+                    set_col(20); set_row(3);
+                }
+            }
+        }
+        if (i == 0) {
+            vprintf_custom("Aun no alocaste ninguna porcion de memoria.");
+        }
+    } else if( strcmp(option, "") == 0 ) {
+        newline();
+        vprintf_custom("Debes ingresar al menos una opcion para"
+                " ser usada por esta funcion.");
+    } else if(strcmp(option, "test") == 0) {
+        malloc_tests(); 
+        q_to_continue(SCREEN_LENGTH - 1, 2, 1);
+    } else {
+        newline();
+        vprintf_custom("El comando que ingresaste no es valido.");
+    }
+    print_vscreen();
+
+}
+
+void free_command(char* params) {
+    char option[20];
+    bool leave = false;
+    unsigned int address = 0;
+    unsigned int i = 0;
+    unsigned int len = 0;
+    void* result = 0;
+
+    len = strlen_custom(params);
+    memset_custom(option, sizeof(option), 0);
+
+    sscanf_custom(params, "%s", option);
+
+    if( strcmp(option, "info") == 0 ) {
+        newline();
+        set_col(2);
+        vprintf_custom("Usa el comando \'free\' seguido de una direccion"
+                " de memoria en base hexadecimal (es decir el numero precedido"
+                " por 0x o 0X), para liberar la porcion de memoria que empieza"
+                " en ese lugar.");
+    } else {
+        for(i = 0; i < len; i++) {
+            if( ishex(option[i] == false) ) {
+                leave = true;
+                break;
+            }
+        }
+        //compruebo que el numero esté en hexa
+        if( leave == false 
+                && option[0] == '0'
+                && (option[1] == 'x' || option[1] == 'X')) {
+            sscanf_custom(option, "%x", &address);
+            
+            result = (void*)free((unsigned int*)address);
+            if( result == (void*)address) {
+                newline(); set_col(2);
+                vprintf_custom("La memoria con direccion %x fue liberada.", address);
+            } else {
+                newline(); set_col(2);
+                vprintf_custom("No existe ningun segmento de memoria alocado"
+                        "en esa direccion.");
+            }
+        } else {
+            newline(); set_col(2);
+            vprintf_custom("Debes ingresar un direccion de memoria en "
+                    "hexa para liberar esa porcion de memoria.");
+        }
+    }
 }

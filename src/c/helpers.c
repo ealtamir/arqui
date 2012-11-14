@@ -1,22 +1,15 @@
 #include "../../include/c/definiciones.h"
-#include "../../include/c/helpers.h"
 #include "../../include/c/primitivas.h"
 #include "../../include/c/stdlibs/ctype.h"
 #include "../../include/c/stdlibs/string.h"
 #include "../../include/c/video.h"
+#include "../../include/c/helpers.h"
 
 /***************************************************************
  *
  *                      FUNCIONES 
  *
 ****************************************************************/
-
-#define va_start(v,l) __builtin_va_start(v,l)
-#define va_arg(v,l)   __builtin_va_arg(v,l)
-#define va_end(v)     __builtin_va_end(v)
-#define va_copy(d,s)  __builtin_va_copy(d,s)
-
-typedef __builtin_va_list va_list;
 
 typedef struct {
     bool minus;
@@ -55,9 +48,6 @@ unsigned int parse_scan(
 
 void __stack_chk_fail(void);
 void printstr(char *s);
-int fprintf_custom(FILE *stream, char *format, va_list *args);
-int fscanf_custom(FILE *stream, const char *format, va_list *args);
-int sscanf_custom(const char* s, const char* format, va_list *args);
 int process_int(int fd, Format format_spec, va_list* args);
 int process_str(int fd, Format format_spec, va_list* args);
 int process_unsgn(int fd, Format format_spec, va_list* args);
@@ -114,7 +104,32 @@ int getc() {
     return fgetc(&stdin);
 }
 
-int sscanf_custom(const char* s, const char* format, va_list *args) {
+
+/***************************************************************
+*   int scanf
+*
+*
+****************************************************************/
+int fscanf_custom(FILE *stream, const char* format, va_list *args) {
+    char c = '\0';
+    char input[256];
+    unsigned int input_converted = 0;
+    unsigned int i = 0;
+    
+    memset_custom(input, sizeof(input), '\0');
+
+    while(i < sizeof(input) && c != '\n') {
+        c = getc(); 
+        fputc(c, stream);
+        input[i] = c;
+        i++;
+    }
+    // Reemplazo el último caracter por \0.
+    input[i-1] = '\0' ;
+    return vsscanf_custom(input, format, args);
+}
+
+int vsscanf_custom(const char* s, const char* format, va_list *args) {
     char c = '\0';
     char d = '\0';
     char current_param[64];
@@ -153,28 +168,13 @@ int sscanf_custom(const char* s, const char* format, va_list *args) {
     return input_converted;
 
 }
-/***************************************************************
-*   int scanf
-*
-*
-****************************************************************/
-int fscanf_custom(FILE *stream, const char* format, va_list *args) {
-    char c = '\0';
-    char input[256];
-    unsigned int input_converted = 0;
-    unsigned int i = 0;
-    
-    memset_custom(input, sizeof(input), '\0');
 
-    while(i < sizeof(input) && c != '\n') {
-        c = getc(); 
-        fputc(c, stream);
-        input[i] = c;
-        i++;
-    }
-    // Reemplazo el último caracter por \0.
-    input[i-1] = '\0' ;
-    return sscanf_custom(input, format, args);
+int sscanf_custom(const char* s, const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    int ret_val = vsscanf_custom(s, format, &args);
+    va_end(args);
+    return ret_val;
 }
 
 unsigned int parse_scan(
@@ -185,7 +185,6 @@ unsigned int parse_scan(
     unsigned int ret_val = 0;
     unsigned int i = 0;     // Chars impresos o leídos.
     bool leave = false;
-
 
     switch(format) {
         case 'd':case 'i':  // integer
@@ -241,6 +240,7 @@ unsigned int scan_hex(char* current_param, va_list *args) {
     bool leave = false;
     unsigned int i = 0;
     unsigned int ret_val = 0;
+    unsigned int* h = 0;
 
     if( current_param[0] == '0' 
             && (current_param[1] == 'x' || current_param[1] == 'X')) {
@@ -251,7 +251,7 @@ unsigned int scan_hex(char* current_param, va_list *args) {
             }
         }
         if( leave == false ) {
-            unsigned int* h = va_arg(*args, unsigned int*);
+            h = va_arg(*args, unsigned int*);
             *h = htoi(current_param);
             ret_val += 1;
         }

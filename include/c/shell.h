@@ -6,5 +6,6 @@
 *
 ****************************************************************/
 int shell();
+void q_to_continue(unsigned int row, unsigned int col, int clear);
 
 #endif
