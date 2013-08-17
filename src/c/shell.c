@@ -45,7 +45,6 @@ int shell() {
     set_col(0); set_row(0);
     clear_vscreen();
     print_vscreen();
-    
 
     while(1) {
         print_str(prompt);
@@ -53,7 +52,7 @@ int shell() {
         c = '\0';
         while( c != '\n' ) {
             c = getc();
-            if( (isdigit(c) == true || isalpha(c) == true || c == ' ') 
+            if( (isdigit(c) == true || isalpha(c) == true || c == ' ')
                     && i < sizeof(input_buffer)  ) {
                 print_chr(c);
                 input_buffer[i] = c;
@@ -88,7 +87,7 @@ void parse_shell_input(char* input_str) {
     len = strlen_custom(cmd_name);
 
     // No estoy pisando código ajeno porque
-    // input_str es bastante grande. 
+    // input_str es bastante grande.
     params = &input_str[len + 1];
 
     for(i = 0; i < FCALL_VECTOR_SIZE; i++) {
@@ -100,7 +99,7 @@ void parse_shell_input(char* input_str) {
     if(f_called == false) {
         newline();
         vprintf_custom("Ese comando no existe. ");
-        vprintf_custom("Escribe \'help\' para obtener una lista de comandos.");                
+        vprintf_custom("Escribe \'help\' para obtener una lista de comandos.");
     }
 
 }
@@ -114,7 +113,7 @@ void init_fcall_vector() {
     commands[i].help = "Comando de prueba para chequear el funcionamiento del shell.";
     commands[i].f = (void (*)()) &test_command;
     i++;
-    
+
     commands[i].f_name = "help";
     commands[i].help = "Imprime los comandos disponibles para el usuario.";
     commands[i].f = (void (*)()) &help;
@@ -139,7 +138,7 @@ void init_fcall_vector() {
     commands[i].help = "Hace una division por cero. Util para probar la int 00.";
     commands[i].f = (void (*)()) &divide_by_cero;
     i++;
-    
+
     commands[i].f_name = "printtests";
     commands[i].help = "Imprime varios strings para testear la funcion printf.";
     commands[i].f = (void (*)()) &print_test;
@@ -189,7 +188,7 @@ void help(char* params) {
         set_col(1);
     }
     q_to_continue(SCREEN_LENGTH - 1, 1, 1);
-    
+
 }
 
 void divide_by_cero(char* params) {

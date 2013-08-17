@@ -31,6 +31,7 @@ unsigned int segments_amount = 0;
 unsigned int allocated_space = 0;
 
 
+void add_to_table(unsigned int* ptr, unsigned int size);
 /***************************************************************
 * void init_system_mem
 *
@@ -95,6 +96,17 @@ void* malloc_custom(unsigned int size, int debug) {
                 next_segment = 0;
                 starting_index = 0;
             }
+        }
+    }
+}
+
+void add_to_table(unsigned int* ptr, unsigned int size) {
+    unsigned int i = 0;
+
+    for( i = 0; i < INFO_TABLE_SIZE; i++ ) {
+        if( info[i].ptr != 0 ) {
+            info[i].ptr = ptr;
+            info[i].size = size;
         }
     }
 }
@@ -318,7 +330,7 @@ void free_command(char* params) {
             sscanf_custom(option, "%x", &address);
             
             result = (void*)free((unsigned int*)address);
-            if( result == (void*)address) {
+            if( result == (void*)address && (unsigned int)result > 0xF) {
                 newline(); set_col(2);
                 vprintf_custom("La memoria con direccion %x fue liberada.", address);
             } else {
